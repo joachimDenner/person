@@ -1,0 +1,8 @@
+schemaVersion: "1.0"
+componentType: service
+name: hello-world-service
+source:
+  path: .
+build:
+  ballerina:
+    file: main.bal
