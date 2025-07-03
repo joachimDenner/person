@@ -8,19 +8,19 @@ import ballerina/openapi;
 }
 
 service /anstalld on new http:Listener(9090) {
-  isolated resource function post .(@http:Payload Anstalld anst) returns int|error? {
+  isolated resource function post .(@http:Payload anstalld anst) returns int|error? {
         return addAnstalld(anst);
     }  
 
-    isolated resource function get [int id]() returns Anstalld|error? {
+    isolated resource function get [int id]() returns anstalld?|error? {
         return getAnstalld(id);
     }
 
-    isolated resource function get .() returns Anstalld[]|error? {
+    isolated resource function get .() returns (anstalld[]|error)? {
         return getAllAnstalld();
     }
 
-    isolated resource function put .(@http:Payload Anstalld anst) returns int|error? {
+    isolated resource function put .(@http:Payload anstalld anst) returns int|error? {
         return updateAnstalld(anst);
     }
 

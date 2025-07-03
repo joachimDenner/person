@@ -1,16 +1,5 @@
-import ballerina/time;
 import ballerinax/postgresql;
 import ballerina/sql;
-
-public type anstalld record {
-    int id?;
-    string firstNamn;
-    string lastName;
-    string workTitle;
-    time:Civil created;
-    time:Civil updated;
-    string comment;
-    };
 
 configurable string USER = ?;
 configurable string PASSWORD = ?;
