@@ -1,6 +1,6 @@
 version: 0.1
 endpoints:
-- name: Hello Service
+- name: Hello Servicexxx
   port: 8080
   type: REST
   networkVisibility: Public
