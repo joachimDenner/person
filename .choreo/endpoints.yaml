@@ -1,7 +1,17 @@
 version: 0.1
 endpoints:
-- name: Hello Servicexxx
-  port: 8080
-  type: REST
-  networkVisibility: Public
-  context: /hello
+  - name: sayHelloEasy
+    port: 8080
+    type: REST
+    networkVisibility: Public
+    context: /rest-api-mot-neon-db/sayHelloEasy
+  - name: sayHelloWithName
+    port: 8080
+    type: REST
+    networkVisibility: Public
+    context: /rest-api-mot-neon-db/sayHelloWithName
+  - name: sayHelloWithNameAndAge
+    port: 8080
+    type: REST
+    networkVisibility: Public
+    context: /rest-api-mot-neon-db/sayHelloWithNameAndAge
