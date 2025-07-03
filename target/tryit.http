@@ -1,0 +1,35 @@
+/*
+### Try Service: 'hello' (http://localhost:8080/hello)
+
+*/
+
+/*
+#### GET /sayHelloEasy
+
+*/
+###
+GET http://localhost:8080/hello/sayHelloEasy
+
+/*
+#### GET /sayHelloWithName
+
+
+**Query Parameters:**
+- `name` [string] (Required)
+
+*/
+###
+GET http://localhost:8080/hello/sayHelloWithName?name={?}
+
+/*
+#### GET /sayHelloWithNameAndAge
+
+
+**Query Parameters:**
+- `name` [string] (Required)
+- `age` [integer] (Required)
+
+*/
+###
+GET http://localhost:8080/hello/sayHelloWithNameAndAge?name={?}&age={?}
+
