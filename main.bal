@@ -1,6 +1,16 @@
 import ballerina/http;
 
-service /hello on new http:Listener(8080) {
+type anstalld record {|
+    int id;
+    string firstNamn;
+    string lastName;
+    string workTitle;
+    string created;
+    string updated;
+    string comment;
+|};
+
+service /anstalld on new http:Listener(8080) {
     resource function get sayHelloEasy() returns string {
         return "Hello, World!";
     }
