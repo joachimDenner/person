@@ -265,6 +265,9 @@ dependencies = [
 	{org = "ballerina", name = "lang.object"},
 	{org = "ballerina", name = "time"}
 ]
+modules = [
+	{org = "ballerina", packageName = "sql", moduleName = "sql"}
+]
 
 [[package]]
 org = "ballerina"
@@ -348,6 +351,7 @@ name = "rest_api_mot_neon_db"
 version = "0.1.0"
 dependencies = [
 	{org = "ballerina", name = "http"},
+	{org = "ballerina", name = "sql"},
 	{org = "ballerinai", name = "observe"},
 	{org = "ballerinax", name = "postgresql"}
 ]
