@@ -1,6 +1,6 @@
 import ballerina/http;
 import ballerinax/postgresql;
-import ballerina/sql;
+//import ballerina/sql;
 
 type anstalld record {|
     int id;
@@ -12,6 +12,18 @@ type anstalld record {|
     string comment;
 |};
 
+final postgresql:Client dbClient = check new postgresql:Client(
+    host = "ep-twilight-darkness-a93wnhjw-pooler.gwc.azure.neon.tech",
+    username = "neondb_owner",
+    password = "npg_hgGofDq81sXy",
+    port = 5432,
+    database = "my_test_db_in_neon",
+    options = {
+        ssl: {
+            mode: postgresql:REQUIRE
+        }
+    }
+);
 
 service /anstalld on new http:Listener(8080) {
     resource function get getAnstalld(string name) returns string {
