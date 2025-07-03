@@ -1,0 +1,12 @@
+/*
+### Try Service: 'hello' (http://localhost:8080/hello)
+
+*/
+
+/*
+#### GET /sayHello
+
+*/
+###
+GET http://localhost:8080/hello/sayHello
+
