@@ -1,9 +1,0 @@
-schemaVersion: 1.2
-componentType: service
-name: rest_api_mot_neon_db
-source:
-  path: .
-build:
-  ballerina:
-    file: main.bal
-    schemaFilePath: openapi.yaml

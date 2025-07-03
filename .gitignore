@@ -1,0 +1,5 @@
+# Ignorera bygg- och cachemappar
+/target/
+*.jar
+*.class
+*.log
