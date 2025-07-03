@@ -1,0 +1,112 @@
+openapi: 3.0.0
+info:
+  title: Anstalld API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/anstalld
+paths:
+  /getAnstalld:
+    get:
+      summary: Get anstalld by name
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+  /createAnstalld:
+    get:
+      summary: Create anstalld by name
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+  /readAnstalld:
+    get:
+      summary: Read anstallda
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+  /allaAnstallda:
+    get:
+      summary: Get all anstallda
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/anstalld'
+  /updateAnstalld:
+    get:
+      summary: Update anstalld by name
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+  /deleteAnstalld:
+    get:
+      summary: Delete anstalld by name
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    anstalld:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstNamn:
+          type: string
+        lastName:
+          type: string
+        workTitle:
+          type: string
+        created:
+          type: string
+        updated:
+          type: string
+        comment:
+          type: string
