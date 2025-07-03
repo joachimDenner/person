@@ -39,7 +39,7 @@ service /anstalld on new http:Listener(8080) {
         return "Read anstallda";
     }
 
-    resource function get .() returns json {
+    resource function get allaAnstallda() returns json {
         sql:ParameterizedQuery query = `SELECT * FROM anstalld`;
         stream<anstalld, error?> resultStream = dbClient->query(query);
 
