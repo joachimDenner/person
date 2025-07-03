@@ -1,0 +1,5 @@
+HOST = "ep-twilight-darkness-a93wnhjw-pooler.gwc.azure.neon.tech"
+PORT = 5432
+USER = "neondb_owner"
+PASSWORD = "npg_hgGofDq81sXy"
+DATABASE = "my_test_db_in_neon"

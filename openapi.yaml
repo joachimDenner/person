@@ -1,54 +1,102 @@
 openapi: 3.1.0
 info:
-  title: REST API mot Neon DB
+  title: Anstalld API
   version: 1.0.0
+  description: API för att hantera anställda
 servers:
-  - url: http://localhost:8080/rest_api_mot_neon_db
+  - url: http://localhost:9090/anstalld
 paths:
-  /rest_api_mot_neon_db/sayHelloEasy:
+  /:
     get:
-      summary: Returns a simple hello message
+      summary: Hämta alla anställda
       responses:
         '200':
-          description: OK
+          description: Lyckad hämtning
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-  /rest_api_mot_neon_db/sayHelloWithName:
-    get:
-      summary: Returns a hello message with a name
-      parameters:
-        - in: query
-          name: name
-          required: true
-          schema:
-            type: string
+                type: array
+                items:
+                  $ref: '#/components/schemas/anstalld'
+    put:
+      summary: Uppdatera en anställd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/anstalld'
       responses:
         '200':
-          description: OK
+          description: Lyckad uppdatering
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-  /rest_api_mot_neon_db/sayHelloWithNameAndAge:
+                type: integer
+    post:
+      summary: Lägg till en anställd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/anstalld'
+      responses:
+        '200':
+          description: Lyckad skapelse
+          content:
+            application/json:
+              schema:
+                type: integer
+  /{id}:
     get:
-      summary: Returns a hello message with a name and age
+      summary: Hämta en anställd via id
       parameters:
-        - in: query
-          name: name
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: age
+        - in: path
+          name: id
           required: true
           schema:
             type: integer
       responses:
         '200':
-          description: OK
+          description: Lyckad hämtning
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/anstalld'
+    delete:
+      summary: Ta bort en anställd via id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lyckad borttagning
+          content:
+            application/json:
+              schema:
+                type: integer
+components:
+  schemas:
+    anstalld:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstNamn:
+          type: string
+        lastName:
+          type: string
+        workTitle:
+          type: string
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        comment:
+          type: string

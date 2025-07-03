@@ -2,21 +2,29 @@ import ballerina/http;
 import ballerina/openapi;
 
 @openapi:ServiceInfo {
-    title: "REST API Mot Neon Db",
+    title: "Anstalld API",
     version: "1.0.0",
     description: "API för att hantera anställda"
 }
 
-service /rest_api_mot_neon_db on new http:Listener(8080) {
-    isolated resource function get sayHelloEasy() returns string {
-        return sayHelloEasy();
+service /anstalld on new http:Listener(9090) {
+  isolated resource function post .(@http:Payload Anstalld anst) returns int|error? {
+        return addAnstalld(anst);
+    }  
+
+    isolated resource function get [int id]() returns Anstalld|error? {
+        return getAnstalld(id);
     }
 
-    isolated resource function get sayHelloWithName(string name) returns string {
-        return sayHelloWithName(name);
+    isolated resource function get .() returns Anstalld[]|error? {
+        return getAllAnstalld();
     }
 
-    isolated resource function get sayHelloWithNameAndAge(string name, int age) returns string {
-        return sayHelloWithNameAndAge(name, age);
+    isolated resource function put .(@http:Payload Anstalld anst) returns int|error? {
+        return updateAnstalld(anst);
+    }
+
+    isolated resource function delete [int id]() returns int|error? {
+        return removeAnstalld(id);
     }
 }
