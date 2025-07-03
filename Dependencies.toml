@@ -343,13 +343,22 @@ modules = [
 ]
 
 [[package]]
+org = "ballerinax"
+name = "postgresql.driver"
+version = "1.6.1"
+modules = [
+	{org = "ballerinax", packageName = "postgresql.driver", moduleName = "postgresql.driver"}
+]
+
+[[package]]
 org = "joachimdenner"
 name = "rest_api_mot_neon_db"
 version = "0.1.0"
 dependencies = [
 	{org = "ballerina", name = "http"},
 	{org = "ballerinai", name = "observe"},
-	{org = "ballerinax", name = "postgresql"}
+	{org = "ballerinax", name = "postgresql"},
+	{org = "ballerinax", name = "postgresql.driver"}
 ]
 modules = [
 	{org = "joachimdenner", packageName = "rest_api_mot_neon_db", moduleName = "rest_api_mot_neon_db"}
