@@ -5,7 +5,7 @@ info:
 servers:
   - url: http://localhost:8080/rest-api-mot-neon-db
 paths:
-  /sayHelloEasy:
+  /rest-api-mot-ne  on-db/sayHelloEasy:
     get:
       summary: Returns a simple hello message
       responses:
@@ -15,7 +15,7 @@ paths:
             text/plain:
               schema:
                 type: string
-  /sayHelloWithName:
+  /rest-api-mot-neon-db/sayHelloWithName:
     get:
       summary: Returns a hello message with a name
       parameters:
@@ -31,7 +31,7 @@ paths:
             text/plain:
               schema:
                 type: string
-  /sayHelloWithNameAndAge:
+  /rest-api-mot-neon-db/sayHelloWithNameAndAge:
     get:
       summary: Returns a hello message with a name and age
       parameters:
