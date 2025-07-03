@@ -11,13 +11,22 @@ type anstalld record {|
 |};
 
 service /anstalld on new http:Listener(8080) {
-    resource function get sayHelloEasy() returns string {
-        return "Hello, World!";
+    resource function get getAnstalld(string name) returns string {
+        return "Get anstalld, " + name + "!";
     }
-    resource function get sayHelloWithName(string name) returns string {
-        return "Hello, " + name + "!";
+
+    resource function get createAnstalld(string name) returns string {
+        return "Create anstalld, " + name;
     }
-    resource function get sayHelloWithNameAndAge(string name, int age) returns string {
-        return "Hello, " + name + "! You are " + age.toString() + " years old.";
+
+    resource function get readAnstalld() returns string {
+        return "Read anstallda";
+    }
+    resource function get updateAnstalld(string name) returns string {
+        return "Update anstalld, " + name;
+    }
+
+    resource function get deleteAnstalld(string name) returns string {
+        return "Delete anstalld, " + name;
     }
 }
