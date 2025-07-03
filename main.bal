@@ -1,4 +1,6 @@
 import ballerina/http;
+import ballerinax/postgresql;
+import ballerina/sql;
 
 type anstalld record {|
     int id;
@@ -9,6 +11,7 @@ type anstalld record {|
     string updated;
     string comment;
 |};
+
 
 service /anstalld on new http:Listener(8080) {
     resource function get getAnstalld(string name) returns string {
