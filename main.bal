@@ -1,6 +1,6 @@
 import ballerina/http;
 
-service /hello on new http:Listener(8080) {
+service /rest-api-mot-neon-db on new http:Listener(8080) {
     resource function get sayHelloEasy() returns string {
         return "Hello, World!";
     }
