@@ -1,6 +1,6 @@
 schemaVersion: 1.2
 componentType: service
-name: choreo-anstalld-service-neondb
+name: rest_api_mot_neon_db
 source:
   path: .
 build:
