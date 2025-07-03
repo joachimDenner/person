@@ -1,0 +1,35 @@
+/*
+### Try Service: 'rest_api_mot_neon_db' (http://localhost:8080/rest_api_mot_neon_db)
+
+*/
+
+/*
+#### GET /sayHelloEasy
+
+*/
+###
+GET http://localhost:8080/rest_api_mot_neon_db/sayHelloEasy
+
+/*
+#### GET /sayHelloWithName
+
+
+**Query Parameters:**
+- `name` [string] (Required)
+
+*/
+###
+GET http://localhost:8080/rest_api_mot_neon_db/sayHelloWithName?name={?}
+
+/*
+#### GET /sayHelloWithNameAndAge
+
+
+**Query Parameters:**
+- `name` [string] (Required)
+- `age` [integer] (Required)
+
+*/
+###
+GET http://localhost:8080/rest_api_mot_neon_db/sayHelloWithNameAndAge?name={?}&age={?}
+
