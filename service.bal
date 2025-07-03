@@ -8,13 +8,15 @@ import ballerina/openapi;
 }
 
 service /rest_api_mot_neon_db on new http:Listener(8080) {
-    resource function get sayHelloEasy() returns string {
-        return "Hello, World!";
+    isolated resource function get sayHelloEasy() returns string {
+        return sayHelloEasy();
     }
-    resource function get sayHelloWithName(string name) returns string {
-        return "Hello, " + name + "!";
+
+    isolated resource function get sayHelloWithName(string name) returns string {
+        return sayHelloWithName(name);
     }
-    resource function get sayHelloWithNameAndAge(string name, int age) returns string {
-        return "Hello, " + name + "! You are " + age.toString() + " years old.";
+
+    isolated resource function get sayHelloWithNameAndAge(string name, int age) returns string {
+        return sayHelloWithNameAndAge(name, age);
     }
 }
