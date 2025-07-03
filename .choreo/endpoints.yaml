@@ -4,14 +4,14 @@ endpoints:
     port: 8080
     type: REST
     networkVisibility: Public
-    context: /rest-api-mot-neon-db/sayHelloEasy
+    context: /rest_api_mot_neon_db/sayHelloEasy
   - name: sayHelloWithName
     port: 8080
     type: REST
     networkVisibility: Public
-    context: /rest-api-mot-neon-db/sayHelloWithName
+    context: /rest_api_mot_neon_db/sayHelloWithName
   - name: sayHelloWithNameAndAge
     port: 8080
     type: REST
     networkVisibility: Public
-    context: /rest-api-mot-neon-db/sayHelloWithNameAndAge
+    context: /rest_api_mot_neon_db/sayHelloWithNameAndAge

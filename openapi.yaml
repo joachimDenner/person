@@ -3,9 +3,9 @@ info:
   title: REST API mot Neon DB
   version: 1.0.0
 servers:
-  - url: http://localhost:8080/rest-api-mot-neon-db
+  - url: http://localhost:8080/rest_api_mot_neon_db
 paths:
-  /rest-api-mot-neon-db/sayHelloEasy:
+  /rest_api_mot_neon_db/sayHelloEasy:
     get:
       summary: Returns a simple hello message
       responses:
@@ -15,7 +15,7 @@ paths:
             text/plain:
               schema:
                 type: string
-  /rest-api-mot-neon-db/sayHelloWithName:
+  /rest_api_mot_neon_db/sayHelloWithName:
     get:
       summary: Returns a hello message with a name
       parameters:
@@ -31,7 +31,7 @@ paths:
             text/plain:
               schema:
                 type: string
-  /rest-api-mot-neon-db/sayHelloWithNameAndAge:
+  /rest_api_mot_neon_db/sayHelloWithNameAndAge:
     get:
       summary: Returns a hello message with a name and age
       parameters:
