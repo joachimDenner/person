@@ -1,6 +1,6 @@
 import ballerina/http;
 import ballerinax/postgresql;
-//import ballerina/sql;
+import ballerina/sql;
 
 type anstalld record {|
     int id;
@@ -37,6 +37,25 @@ service /anstalld on new http:Listener(8080) {
     resource function get readAnstalld() returns string {
         return "Read anstallda";
     }
+
+    resource function get .() returns json {
+        sql:ParameterizedQuery query = `SELECT * FROM anstalld`;
+        stream<anstalld, error?> resultStream = dbClient->query(query);
+
+        anstalld[] resultList = [];
+        error? e = resultStream.forEach(function(anstalld row) {
+            resultList.push(row);
+        });
+
+        if e is error {
+            return {
+                "error": true,
+                "message": "Kunde inte hämta anställda: " + e.message()
+            };
+        }
+         return <json>resultList;
+    }
+
     resource function get updateAnstalld(string name) returns string {
         return "Update anstalld, " + name;
     }
