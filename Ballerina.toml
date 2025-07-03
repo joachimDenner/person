@@ -1,6 +1,6 @@
 [package]
 org = "joachimdenner"
-name = "choreo_hello_world"
+name = "choreo_anstalld_service_neondb"
 version = "0.1.0"
 distribution = "2201.12.7"
 

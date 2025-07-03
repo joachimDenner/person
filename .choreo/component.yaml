@@ -1,6 +1,6 @@
 schemaVersion: 1.2
 componentType: service
-name: hello-world-service
+name: choreo-anstalld-service-neondb
 source:
   path: .
 build:
