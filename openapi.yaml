@@ -3,24 +3,20 @@ info:
   title: Anstalld API
   version: 1.0.0
 servers:
-  - url: http://localhost:8080/anstalld
+  - url: https://6de04eb5-ff57-4d64-b80e-6284e10f8dc5-dev.e1-eu-north-azure.choreoapis.dev/full-stack-test-project/rest-api-mot-neondb/v1.0
 paths:
-  /getAnstalld:
+  /hamtaAnstalld:
     get:
-      summary: Get anstalld by name
-      parameters:
-        - in: query
-          name: name
-          schema:
-            type: string
-          required: true
+      summary: Get anstalld
       responses:
         '200':
           description: Success
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: array
+                items:
+                  $ref: '#/components/schemas/anstalld'
   /createAnstalld:
     get:
       summary: Create anstalld by name

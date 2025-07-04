@@ -27,8 +27,22 @@ final postgresql:Client dbClient = check new postgresql:Client(
 );
 
 service /anstalld on new http:Listener(8080) {
-    resource function get getAnstalld(string name) returns string {
-        return "Get anstalld, " + name + "!";
+    //   Hämta (GET) en anställd
+    resource function get hamtaAnstalld(int id) returns json {
+        sql:ParameterizedQuery query = `SELECT * FROM anstalld WHERE id = ${id}`;
+        stream<anstalld, error?> resultStream = dbClient->query(query);
+
+        anstalld[] resultList = [];
+        error? e = resultStream.forEach(function(anstalld row) {
+            resultList.push(row);
+        });
+
+        if e is error {
+            return {
+                "message": "Kunde inte hämta anställda: " + e.message()
+            };
+        }
+        return <json>resultList;
     }
 
     resource function get createAnstalld(string name) returns string {
@@ -39,6 +53,7 @@ service /anstalld on new http:Listener(8080) {
         return "Read anstallda";
     }
 
+    //   Hämta (GET) alla anställda
     resource function get allaAnstallda() returns json {
         sql:ParameterizedQuery query = `SELECT * FROM anstalld`;
         stream<anstalld, error?> resultStream = dbClient->query(query);
@@ -50,11 +65,10 @@ service /anstalld on new http:Listener(8080) {
 
         if e is error {
             return {
-                "error": true,
                 "message": "Kunde inte hämta anställda: " + e.message()
             };
         }
-         return <json>resultList;
+        return <json>resultList;
     }
 
     resource function get updateAnstalld(string name) returns string {
