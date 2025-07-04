@@ -4,7 +4,7 @@ import ballerinax/postgresql.driver as _;
 import ballerina/sql;
 
 type anstalld record {|
-    int id;
+    int id?;
     string firstNamn;
     string lastName;
     string workTitle;
@@ -45,13 +45,37 @@ service /anstalld on new http:Listener(8080) {
         return <json>resultList;
     }
 
-    resource function get createAnstalld(string name) returns string {
-        return "Create anstalld, " + name;
+   // Skapa (POST) en ny anställd
+    resource function post skapaAnstalld(anstalld anst) returns json|error {
+        sql:ParameterizedQuery query = `INSERT INTO anstalld (
+                "firstNamn", 
+                "lastName", 
+                "workTitle",
+                "created",
+                "updated",
+                "comment"
+            ) VALUES (
+                ${anst.firstNamn}, 
+                ${anst.lastName},
+                ${anst.workTitle}, 
+                ${anst.created}, 
+                ${anst.updated},
+                ${anst.comment}
+            ) RETURNING id`;
+
+        int insertedId = check dbClient->queryRow(query, int);
+        if insertedId > 0 {
+            return {
+                message: "Anställd skapades!",
+                id: insertedId
+            };
+        } else {
+            return {
+                message: "Kunde inte skapa ny anställd!"
+            };
+        }
     }
 
-    resource function get readAnstalld() returns string {
-        return "Read anstallda";
-    }
 
     //   Hämta (GET) alla anställda
     resource function get allaAnstallda() returns json {
@@ -75,7 +99,24 @@ service /anstalld on new http:Listener(8080) {
         return "Update anstalld, " + name;
     }
 
-    resource function get deleteAnstalld(string name) returns string {
-        return "Delete anstalld, " + name;
+    //  Ta bort (DELETE) en anställd
+    resource function delete tabortAnstalld(int id) returns json {
+        sql:ExecutionResult|error execResult = dbClient->execute(`
+        DELETE FROM anstalld WHERE id = ${id}
+        `);
+
+        if execResult is sql:ExecutionResult {
+            int? affectedRowCount = execResult.affectedRowCount;
+            if affectedRowCount is int && affectedRowCount == 0 {
+                return { "message": "Anställd med id: " + id.toString() + " saknas!" };
+            }
+                        
+            if affectedRowCount is int && affectedRowCount > 0 {
+                return { "message": "Anställd med id: " + id.toString() + " borttagen!" };
+            }
+            
+        } else {
+            return { "message": "Fel inträffade vid borttagning: " + execResult.message() };
+        }
     }
-}
+}   
