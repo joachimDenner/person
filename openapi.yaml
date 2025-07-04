@@ -7,19 +7,34 @@ servers:
 paths:
   /hamtaAnstalld:
     get:
-      summary: Get anstalld
+      summary: Hämta en anställd
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          required: true
       responses:
         '200':
-          description: Success
+          description: En anställd
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/anstalld'
+                $ref: '#/components/schemas/anstalld'
+        '404':
+          description: Ingen anställd hittades
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                  message:
+                    type: string
   /createAnstalld:
     get:
-      summary: Create anstalld by name
+      summary: Skapa anställd (demo)
       parameters:
         - in: query
           name: name
@@ -28,36 +43,47 @@ paths:
           required: true
       responses:
         '200':
-          description: Success
+          description: Skapad
           content:
             text/plain:
               schema:
                 type: string
   /readAnstalld:
     get:
-      summary: Read anstallda
+      summary: Läs anställda (demo)
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
                 type: string
   /allaAnstallda:
     get:
-      summary: Get all anstallda
+      summary: Hämta alla anställda
       responses:
         '200':
-          description: Success
+          description: Lista av anställda
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/anstalld'
+        '500':
+          description: Fel vid hämtning
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                  message:
+                    type: string
   /updateAnstalld:
     get:
-      summary: Update anstalld by name
+      summary: Uppdatera anställd (demo)
       parameters:
         - in: query
           name: name
@@ -66,14 +92,14 @@ paths:
           required: true
       responses:
         '200':
-          description: Success
+          description: Uppdaterad
           content:
             text/plain:
               schema:
                 type: string
   /deleteAnstalld:
     get:
-      summary: Delete anstalld by name
+      summary: Ta bort anställd (demo)
       parameters:
         - in: query
           name: name
@@ -82,7 +108,7 @@ paths:
           required: true
       responses:
         '200':
-          description: Success
+          description: Borttagen
           content:
             text/plain:
               schema:
