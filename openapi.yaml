@@ -14,6 +14,7 @@ paths:
           schema:
             type: integer
           required: true
+          example: 1
       responses:
         '200':
           description: En eller flera anställda
@@ -32,6 +33,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Anställd hittades inte"
 
   /skapaAnstalld:
     post:
@@ -41,17 +43,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/anstalld'
+              $ref: '#/components/schemas/anstalldCreate'
             example:
-              firstNamn: "Förnamn"
-              lastName: "Efternamn"
-              workTitle: "Title"
-              created: "YYYY-MM-DD"
-              updated: "YYYY-MM-DD"
-              comment: "Kommentar (optional)"
+              firstNamn: "Anna"
+              lastName: "Andersson"
+              workTitle: "Systemutvecklare"
+              created: "2025-07-04"
+              updated: "2025-07-04"
+              comment: "Ny på jobbet"
       responses:
         '200':
-          description: Skapningsresultat
+          description: Resultat av skapandet
           content:
             application/json:
               schema:
@@ -59,8 +61,12 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Anställd skapades!"
+                  id:
+                    type: integer
+                    example: 123
 
-  /allaAnstallda:
+  /hamtaAllaAnstallda:
     get:
       summary: Hämta alla anställda
       responses:
@@ -81,23 +87,55 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Kunde inte hämta anställda"
 
-  /updateAnstalld:
-    get:
-      summary: Uppdatera anställd (demo/fördefinierad text)
+  /uppdateraAnstalld:
+    put:
+      summary: Uppdatera en anställd via ID
       parameters:
         - in: query
-          name: name
+          name: id
           schema:
-            type: string
+            type: integer
           required: true
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/anstalldCreate'
+            example:
+              firstNamn: "Anna"
+              lastName: "Andersson"
+              workTitle: "Systemutvecklare"
+              created: "2025-07-04"
+              updated: "2025-07-05"
+              comment: "Uppdaterad kommentar"
       responses:
         '200':
-          description: Svarstext
+          description: Resultat av uppdateringen
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Anställd uppdaterades!"
+                  id:
+                    type: integer
+                    example: 1
+        '400':
+          description: Fel vid uppdatering
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Kunde inte uppdatera anställd!"
 
   /tabortAnstalld:
     delete:
@@ -108,9 +146,10 @@ paths:
           schema:
             type: integer
           required: true
+          example: 1
       responses:
         '200':
-          description: Resultatmeddelande
+          description: Resultat av borttagning
           content:
             application/json:
               schema:
@@ -118,6 +157,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Anställd med id: 1 borttagen!"
         '404':
           description: Anställd hittades inte
           content:
@@ -127,6 +167,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Anställd med id: 1 saknas!"
 
 components:
   schemas:
@@ -135,15 +176,56 @@ components:
       properties:
         id:
           type: integer
+          example: 1
         firstNamn:
           type: string
+          example: "Anna"
         lastName:
           type: string
+          example: "Andersson"
         workTitle:
           type: string
+          example: "Systemutvecklare"
         created:
           type: string
+          format: date
+          example: "2025-07-04"
         updated:
           type: string
+          format: date
+          example: "2025-07-04"
         comment:
           type: string
+          example: "Ny på jobbet"
+
+    # Schema för POST och PUT - utan id (autogenererat i DB)
+    anstalldCreate:
+      type: object
+      required:
+        - firstNamn
+        - lastName
+        - workTitle
+        - created
+        - updated
+        - comment
+      properties:
+        firstNamn:
+          type: string
+          example: "Anna"
+        lastName:
+          type: string
+          example: "Andersson"
+        workTitle:
+          type: string
+          example: "Systemutvecklare"
+        created:
+          type: string
+          format: date
+          example: "2025-07-04"
+        updated:
+          type: string
+          format: date
+          example: "2025-07-04"
+        comment:
+          type: string
+          example: "Ny på jobbet"

@@ -13,12 +13,18 @@ type anstalld record {|
     string comment;
 |};
 
+configurable string USER = ?;
+configurable string PASSWORD = ?;
+configurable string HOST = ?;
+configurable int PORT = ?;
+configurable string DATABASE = ?;
+
 final postgresql:Client dbClient = check new postgresql:Client(
-    host = "ep-twilight-darkness-a93wnhjw-pooler.gwc.azure.neon.tech",
-    username = "neondb_owner",
-    password = "npg_hgGofDq81sXy",
-    port = 5432,
-    database = "my_test_db_in_neon",
+    host = HOST,
+    username = USER,
+    password = PASSWORD,
+    port = PORT,
+    database = DATABASE,
     options = {
         ssl: {
             mode: postgresql:REQUIRE
@@ -78,7 +84,7 @@ service /anstalld on new http:Listener(8080) {
 
 
     //   Hämta (GET) alla anställda
-    resource function get allaAnstallda() returns json {
+    resource function get hamtaAllaAnstallda() returns json {
         sql:ParameterizedQuery query = `SELECT * FROM anstalld`;
         stream<anstalld, error?> resultStream = dbClient->query(query);
 
@@ -95,8 +101,30 @@ service /anstalld on new http:Listener(8080) {
         return <json>resultList;
     }
 
-    resource function get updateAnstalld(string name) returns string {
-        return "Update anstalld, " + name;
+    // Uppdatera (PUT) en anställd
+    resource function put uppdateraAnstalld(int id, anstalld anst) returns json|error {
+        sql:ParameterizedQuery query = `UPDATE anstalld SET
+                "firstNamn" = ${anst.firstNamn},
+                "lastName" = ${anst.lastName},
+                "workTitle" = ${anst.workTitle},
+                "created" = ${anst.created},
+                "updated" = ${anst.updated},
+                "comment" = ${anst.comment}
+            WHERE id = ${id}`;
+
+        sql:ExecutionResult result = check dbClient->execute(query);
+        int? affectedRowCount = result.affectedRowCount;
+
+        if affectedRowCount is int && affectedRowCount > 0 {
+            return {
+                message: "Anställd uppdaterades!",
+                id: id
+            };
+        } else {
+            return {
+                message: "Kunde inte uppdatera anställd!"
+            };
+        }
     }
 
     //  Ta bort (DELETE) en anställd
