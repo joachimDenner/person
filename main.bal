@@ -34,7 +34,7 @@ final postgresql:Client dbClient = check new postgresql:Client(
 
 service /anstalld on new http:Listener(8080) {
     //   Hämta (GET) en anställd
-    resource function get hamtaAnstalld(int id) returns json {
+    resource function get hamtaAnstalldX(int id) returns json {
         sql:ParameterizedQuery query = `SELECT * FROM anstalld WHERE id = ${id}`;
         stream<anstalld, error?> resultStream = dbClient->query(query);
 
