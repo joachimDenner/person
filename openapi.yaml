@@ -66,12 +66,35 @@ paths:
                     type: integer
                     example: 123
 
-  /hamtaAllaAnstallda:
+  /hamtaAllaAnstalldaByIdAsc:
     get:
-      summary: Hämta alla anställda
+      summary: Hämta alla anställda sorterade efter ID (stigande)
       responses:
         '200':
-          description: Lista av anställda
+          description: Lista av anställda sorterade efter ID (stigande)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/anstalld'
+        '500':
+          description: Fel vid hämtning
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Kunde inte hämta anställda"
+
+  /hamtaAllaAnstalldaByLastNameAsc:
+    get:
+      summary: Hämta alla anställda sorterade efter lastName (stigande)
+      responses:
+        '200':
+          description: Lista av anställda sorterade på efternamn (stigande)
           content:
             application/json:
               schema:

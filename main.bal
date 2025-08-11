@@ -83,9 +83,27 @@ service /anstalld on new http:Listener(8080) {
     }
 
 
-    //   Hämta (GET) alla anställda
-    resource function get hamtaAllaAnstallda() returns json {
+    //   Hämta (GET) alla anställda by id
+    resource function get hamtaAllaAnstalldaByIdAsc() returns json {
         sql:ParameterizedQuery query = `SELECT * FROM anstalld order by id asc`;
+        stream<anstalld, error?> resultStream = dbClient->query(query);
+
+        anstalld[] resultList = [];
+        error? e = resultStream.forEach(function(anstalld row) {
+            resultList.push(row);
+        });
+
+        if e is error {
+            return {
+                "message": "Kunde inte hämta anställda: " + e.message()
+            };
+        }
+        return <json>resultList;
+    }
+
+    //   Hämta (GET) alla anställda by lastName
+    resource function get hamtaAllaAnstalldaByLastNameAsc() returns json {
+        sql:ParameterizedQuery query = `SELECT * FROM anstalld order by lastName asc`;
         stream<anstalld, error?> resultStream = dbClient->query(query);
 
         anstalld[] resultList = [];
