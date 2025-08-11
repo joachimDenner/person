@@ -35,7 +35,7 @@ final postgresql:Client dbClient = check new postgresql:Client(
 service /anstalld on new http:Listener(8080) {
     //   Hämta (GET) en anställd
     resource function get hamtaAnstalld(int id) returns json {
-        sql:ParameterizedQuery query = `SELECT * FROM anstalld WHERE id = ${id} order by id asc`;
+        sql:ParameterizedQuery query = `SELECT * FROM anstalld WHERE id = ${id}`;
         stream<anstalld, error?> resultStream = dbClient->query(query);
 
         anstalld[] resultList = [];
@@ -85,7 +85,7 @@ service /anstalld on new http:Listener(8080) {
 
     //   Hämta (GET) alla anställda
     resource function get hamtaAllaAnstallda() returns json {
-        sql:ParameterizedQuery query = `SELECT * FROM anstalld`;
+        sql:ParameterizedQuery query = `SELECT * FROM anstalld order by id asc`;
         stream<anstalld, error?> resultStream = dbClient->query(query);
 
         anstalld[] resultList = [];

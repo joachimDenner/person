@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Anstalld API
+  title: Anstalld API och CRUD-endpoints
   version: 1.0.0
 servers:
   - url: https://6de04eb5-ff57-4d64-b80e-6284e10f8dc5-dev.e1-eu-north-azure.choreoapis.dev/full-stack-test-project/rest-api-mot-neondb/v1.0
