@@ -103,7 +103,7 @@ service /anstalld on new http:Listener(8080) {
 
     //   Hämta (GET) alla anställda by lastName
     resource function get hamtaAllaAnstalldaByLastNameAsc() returns json {
-        sql:ParameterizedQuery query = `SELECT * FROM anstalld order by lastName asc`;
+        sql:ParameterizedQuery query = `SELECT * FROM anstalld ORDER BY "lastName" asc`;
         stream<anstalld, error?> resultStream = dbClient->query(query);
 
         anstalld[] resultList = [];
