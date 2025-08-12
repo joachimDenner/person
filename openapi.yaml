@@ -1,254 +1,192 @@
 openapi: 3.0.1
 info:
-  title: Anstalld API och CRUD-endpoints
-  version: 1.0.0
+  title: Anstalld
+  version: 0.1.0
 servers:
-  - url: https://6de04eb5-ff57-4d64-b80e-6284e10f8dc5-dev.e1-eu-north-azure.choreoapis.dev/full-stack-test-project/rest-api-mot-neondb/v1.0
+- url: "{server}:{port}/anstalld"
+  variables:
+    server:
+      default: http://localhost
+    port:
+      default: "8080"
 paths:
   /hamtaAnstalld:
     get:
-      summary: Hämta en anställd via ID
+      operationId: getHamtaanstalld
       parameters:
-        - in: query
-          name: id
-          schema:
-            type: integer
-          required: true
-          example: 1
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
       responses:
-        '200':
-          description: En eller flera anställda
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/anstalld'
-        '404':
-          description: Ingen anställd hittades
+        "200":
+          description: Ok
           content:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Anställd hittades inte"
-
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
   /skapaAnstalld:
     post:
-      summary: Skapa en ny anställd
+      operationId: postSkapaanstalld
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/anstalldCreate'
-            example:
-              firstNamn: "Anna"
-              lastName: "Andersson"
-              workTitle: "Systemutvecklare"
-              created: "2025-07-04"
-              updated: "2025-07-04"
-              comment: "Ny på jobbet"
+              $ref: '#/components/schemas/anstalld'
+        required: true
       responses:
-        '200':
-          description: Resultat av skapandet
+        "201":
+          description: Created
           content:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Anställd skapades!"
-                  id:
-                    type: integer
-                    example: 123
-
+        "500":
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
   /hamtaAllaAnstalldaByIdAsc:
     get:
-      summary: Hämta alla anställda sorterade efter ID (stigande)
+      operationId: getHamtaallaanstalldabyidasc
       responses:
-        '200':
-          description: Lista av anställda sorterade efter ID (stigande)
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/anstalld'
-        '500':
-          description: Fel vid hämtning
+        "200":
+          description: Ok
           content:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Kunde inte hämta anställda"
-
   /hamtaAllaAnstalldaByLastNameAsc:
     get:
-      summary: Hämta alla anställda sorterade efter lastName (stigande)
+      operationId: getHamtaallaanstalldabylastnameasc
       responses:
-        '200':
-          description: Lista av anställda sorterade på efternamn (stigande)
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/anstalld'
-        '500':
-          description: Fel vid hämtning
+        "200":
+          description: Ok
           content:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Kunde inte hämta anställda"
-
   /uppdateraAnstalld:
     put:
-      summary: Uppdatera en anställd via ID
+      operationId: putUppdateraanstalld
       parameters:
-        - in: query
-          name: id
-          schema:
-            type: integer
-          required: true
-          example: 1
-      requestBody:
+      - name: id
+        in: query
         required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/anstalldCreate'
-            example:
-              firstNamn: "Anna"
-              lastName: "Andersson"
-              workTitle: "Systemutvecklare"
-              created: "2025-07-04"
-              updated: "2025-07-05"
-              comment: "Uppdaterad kommentar"
+              $ref: '#/components/schemas/anstalld'
+        required: true
       responses:
-        '200':
-          description: Resultat av uppdateringen
+        "200":
+          description: Ok
           content:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Anställd uppdaterades!"
-                  id:
-                    type: integer
-                    example: 1
-        '400':
-          description: Fel vid uppdatering
+        "500":
+          description: InternalServerError
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Kunde inte uppdatera anställd!"
-
+                $ref: '#/components/schemas/ErrorPayload'
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
   /tabortAnstalld:
     delete:
-      summary: Ta bort en anställd via ID
+      operationId: deleteTabortanstalld
       parameters:
-        - in: query
-          name: id
-          schema:
-            type: integer
-          required: true
-          example: 1
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
       responses:
-        '200':
-          description: Resultat av borttagning
+        "200":
+          description: Ok
           content:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Anställd med id: 1 borttagen!"
-        '404':
-          description: Anställd hittades inte
+        "400":
+          description: BadRequest
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Anställd med id: 1 saknas!"
-
+                $ref: '#/components/schemas/ErrorPayload'
 components:
   schemas:
+    ErrorPayload:
+      required:
+      - message
+      - method
+      - path
+      - reason
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+        status:
+          type: integer
+          format: int64
+        reason:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        method:
+          type: string
     anstalld:
+      required:
+      - comment
+      - created
+      - firstNamn
+      - lastName
+      - updated
+      - workTitle
       type: object
       properties:
         id:
           type: integer
-          example: 1
+          format: int64
         firstNamn:
           type: string
-          example: "Anna"
         lastName:
           type: string
-          example: "Andersson"
         workTitle:
           type: string
-          example: "Systemutvecklare"
         created:
           type: string
-          format: date
-          example: "2025-07-04"
         updated:
           type: string
-          format: date
-          example: "2025-07-04"
         comment:
           type: string
-          example: "Ny på jobbet"
-
-    # Schema för POST och PUT - utan id (autogenererat i DB)
-    anstalldCreate:
-      type: object
-      required:
-        - firstNamn
-        - lastName
-        - workTitle
-        - created
-        - updated
-        - comment
-      properties:
-        firstNamn:
-          type: string
-          example: "Anna"
-        lastName:
-          type: string
-          example: "Andersson"
-        workTitle:
-          type: string
-          example: "Systemutvecklare"
-        created:
-          type: string
-          format: date
-          example: "2025-07-04"
-        updated:
-          type: string
-          format: date
-          example: "2025-07-04"
-        comment:
-          type: string
-          example: "Ny på jobbet"
+      additionalProperties: false
