@@ -1,6 +1,6 @@
 [package]
 org = "joachimdenner"
-name = "rest_api_mot_neon_db"
+name = "rest_api_person"
 version = "0.1.0"
 distribution = "2201.12.7"
 

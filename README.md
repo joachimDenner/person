@@ -1,1 +1,1 @@
-Testprojekt
+Testprojekt baserat på tabelldefinition i MDS.

@@ -3,14 +3,31 @@ import ballerinax/postgresql;
 import ballerinax/postgresql.driver as _;
 import ballerina/sql;
 
-type anstalld record {|
+type person record {|
     int id?;
-    string firstNamn;
-    string lastName;
-    string workTitle;
-    string created;
-    string updated;
-    string comment;
+    string careOf;
+    string utdelningsadress1;
+    string utdelningsadress2;
+    string postNr;
+    string postOrt;
+    string forNamn;
+    string mellanNamn;
+    string efterNamn;
+    string aviseringsNamn;
+    string code;
+    string kodTilltalsNamn;
+    string lan;
+    string kommun;
+    string forsamling;
+    string folkBokföringsDatum;
+    string folkBokföringsTyp;
+    string typAvIdBet;
+    string idBet;
+    string hanvisningsNummer;
+    string sekretessMark;
+    string skyddadFolkBokföring;
+    string skapadDatum;
+    string uppdateradDatum;
 |};
 
 configurable string USER = ?;
@@ -32,102 +49,138 @@ final postgresql:Client dbClient = check new postgresql:Client(
     }
 );
 
-service /anstalld on new http:Listener(8080) {
-    //   Hämta (GET) en anställd
-    resource function get hamtaAnstalld(int id) returns json {
-        sql:ParameterizedQuery query = `SELECT * FROM anstalld WHERE id = ${id}`;
-        stream<anstalld, error?> resultStream = dbClient->query(query);
+service /person on new http:Listener(8080) {
+    //   Hämta (GET) en person
+    resource function get hamtaPerson(int id) returns json {
+        sql:ParameterizedQuery query = `SELECT * FROM person WHERE id = ${id}`;
+        stream<person, error?> resultStream = dbClient->query(query);
 
-        anstalld[] resultList = [];
-        error? e = resultStream.forEach(function(anstalld row) {
+        person[] resultList = [];
+        error? e = resultStream.forEach(function(person row) {
             resultList.push(row);
         });
 
         if e is error {
             return {
-                "message": "Kunde inte hämta anställda: " + e.message()
+                "message": "Kunde inte hämta person: " + e.message()
             };
         }
         return <json>resultList;
     }
 
-   // Skapa (POST) en ny anställd
-    resource function post skapaAnstalld(anstalld anst) returns json|error {
-        sql:ParameterizedQuery query = `INSERT INTO anstalld (
-                "firstNamn", 
-                "lastName", 
-                "workTitle",
-                "created",
-                "updated",
-                "comment"
+   // Skapa (POST) en ny person
+    resource function post skapaPerson(person pers) returns json|error {
+        sql:ParameterizedQuery query = `INSERT INTO person (
+                "forNamn", 
+                "mellanNamn", 
+                "efterNamn",
+                "aviseringsNamn",
+                "code",
+                "kodTilltalsNamn",
+                "lan",
+                "kommun",
+                "forsamling",
+                "folkBokföringsDatum",
+                "folkBokföringsTyp",
+                "typAvIdBet",
+                "idBet",
+                "hanvisningsNummer",
+                "sekretessMark",
+                "skyddadFolkBokföring",
+                "skapadDatum",
+                "uppdateradDatum"
             ) VALUES (
-                ${anst.firstNamn}, 
-                ${anst.lastName},
-                ${anst.workTitle}, 
-                ${anst.created}, 
-                ${anst.updated},
-                ${anst.comment}
+                ${pers.forNamn}, 
+                ${pers.mellanNamn},
+                ${pers.efterNamn}, 
+                ${pers.aviseringsNamn}, 
+                ${pers.code}, 
+                ${pers.kodTilltalsNamn}, 
+                ${pers.lan}, 
+                ${pers.kommun}, 
+                ${pers.forsamling}, 
+                ${pers.folkBokföringsDatum}, 
+                ${pers.folkBokföringsTyp}, 
+                ${pers.typAvIdBet}, 
+                ${pers.idBet}, 
+                ${pers.hanvisningsNummer}, 
+                ${pers.sekretessMark}, 
+                ${pers.skyddadFolkBokföring}, 
+                ${pers.skapadDatum}, 
+                ${pers.uppdateradDatum}
             ) RETURNING id`;
 
         int insertedId = check dbClient->queryRow(query, int);
         if insertedId > 0 {
             return {
-                message: "Anställd skapades!",
+                message: "Person skapades!",
                 id: insertedId
             };
         } else {
             return {
-                message: "Kunde inte skapa ny anställd!"
+                message: "Kunde inte skapa ny person!"
             };
         }
     }
 
 
-    //   Hämta (GET) alla anställda by id
-    resource function get hamtaAllaAnstalldaByIdAsc() returns json {
-        sql:ParameterizedQuery query = `SELECT * FROM anstalld order by id asc`;
-        stream<anstalld, error?> resultStream = dbClient->query(query);
+    //   Hämta (GET) alla personer by id
+    resource function get hamtaAllaPersonerByIdAsc() returns json {
+        sql:ParameterizedQuery query = `SELECT * FROM person order by id asc`;
+        stream<person, error?> resultStream = dbClient->query(query);
 
-        anstalld[] resultList = [];
-        error? e = resultStream.forEach(function(anstalld row) {
+        person[] resultList = [];
+        error? e = resultStream.forEach(function(person row) {
             resultList.push(row);
         });
 
         if e is error {
             return {
-                "message": "Kunde inte hämta anställda: " + e.message()
+                "message": "Kunde inte hämta personer: " + e.message()
             };
         }
         return <json>resultList;
     }
 
-    //   Hämta (GET) alla anställda by lastName
-    resource function get hamtaAllaAnstalldaByLastNameAsc() returns json {
-        sql:ParameterizedQuery query = `SELECT * FROM anstalld ORDER BY "lastName" asc`;
-        stream<anstalld, error?> resultStream = dbClient->query(query);
+    //   Hämta (GET) alla personer by efterNamn
+    resource function get hamtaAllaPersonerByEfterNamnAsc() returns json {
+        sql:ParameterizedQuery query = `SELECT * FROM person ORDER BY "efterNamn" asc`;
+        stream<person, error?> resultStream = dbClient->query(query);
 
-        anstalld[] resultList = [];
-        error? e = resultStream.forEach(function(anstalld row) {
+        person[] resultList = [];
+        error? e = resultStream.forEach(function(person row) {
             resultList.push(row);
         });
 
         if e is error {
             return {
-                "message": "Kunde inte hämta anställda: " + e.message()
+                "message": "Kunde inte hämta personer: " + e.message()
             };
         }
         return <json>resultList;
     }
 
-    // Uppdatera (PUT) en anställd
-    resource function put uppdateraAnstalld(int id, anstalld anst) returns json|error {
-        sql:ParameterizedQuery query = `UPDATE anstalld SET
-                "firstNamn" = ${anst.firstNamn},
-                "lastName" = ${anst.lastName},
-                "workTitle" = ${anst.workTitle},
-                "created" = ${anst.created},
-                "updated" = ${anst.updated},
-                "comment" = ${anst.comment}
+    // Uppdatera (PUT) en person
+    resource function put uppdateraPerson(int id, person pers) returns json|error {
+        sql:ParameterizedQuery query = `UPDATE person SET
+                "forNamn" = ${pers.forNamn},
+                "mellanNamn" = ${pers.mellanNamn},
+                "efterNamn" = ${pers.efterNamn},
+                "aviseringsNamn" = ${pers.aviseringsNamn},
+                "code" = ${pers.code},
+                "kodTilltalsNamn" = ${pers.kodTilltalsNamn},
+                "lan" = ${pers.lan},
+                "kommun" = ${pers.kommun},
+                "forsamling" = ${pers.forsamling},
+                "folkBokföringsDatum" = ${pers.folkBokföringsDatum},
+                "folkBokföringsTyp" = ${pers.folkBokföringsTyp},
+                "typAvIdBet" = ${pers.typAvIdBet},
+                "idBet" = ${pers.idBet},
+                "hanvisningsNummer" = ${pers.hanvisningsNummer},
+                "sekretessMark" = ${pers.sekretessMark},
+                "skyddadFolkBokföring" = ${pers.skyddadFolkBokföring},
+                "skapadDatum" = ${pers.skapadDatum},
+                "uppdateradDatum" = ${pers.uppdateradDatum}
             WHERE id = ${id}`;
 
         sql:ExecutionResult result = check dbClient->execute(query);
@@ -135,30 +188,30 @@ service /anstalld on new http:Listener(8080) {
 
         if affectedRowCount is int && affectedRowCount > 0 {
             return {
-                message: "Anställd uppdaterades!",
+                message: "Person uppdaterades!",
                 id: id
             };
         } else {
             return {
-                message: "Kunde inte uppdatera anställd!"
+                message: "Kunde inte uppdatera person!"
             };
         }
     }
 
-    //  Ta bort (DELETE) en anställd
-    resource function delete tabortAnstalld(int id) returns json {
+    //  Ta bort (DELETE) en person
+    resource function delete tabortPerson(int id) returns json {
         sql:ExecutionResult|error execResult = dbClient->execute(`
-        DELETE FROM anstalld WHERE id = ${id}
+        DELETE FROM person WHERE id = ${id}
         `);
 
         if execResult is sql:ExecutionResult {
             int? affectedRowCount = execResult.affectedRowCount;
             if affectedRowCount is int && affectedRowCount == 0 {
-                return { "message": "Anställd med id: " + id.toString() + " saknas!" };
+                return { "message": "Person med id: " + id.toString() + " saknas!" };
             }
                         
             if affectedRowCount is int && affectedRowCount > 0 {
-                return { "message": "Anställd med id: " + id.toString() + " borttagen!" };
+                return { "message": "Person med id: " + id.toString() + " borttagen!" };
             }
             
         } else {
