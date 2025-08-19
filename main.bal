@@ -26,7 +26,7 @@ type person record {|
     string hanvisningsNummer;
     string sekretessMark;
     string skyddadFolkBokföring;
-    string skapadDatum ?; // Används inte vid Uppdatera.
+    string skapadDatum?;
     string uppdateradDatum;
 |};
 
@@ -71,6 +71,11 @@ service /person on new http:Listener(8080) {
    // Skapa (POST) en ny person
     resource function post skapaPerson(person pers) returns json|error {
         sql:ParameterizedQuery query = `INSERT INTO person (
+                "careOf",
+                "utdelningsadress1",
+                "utdelningsadress2",
+                "postNr",
+                "postOrt",
                 "forNamn", 
                 "mellanNamn", 
                 "efterNamn",
@@ -87,9 +92,13 @@ service /person on new http:Listener(8080) {
                 "hanvisningsNummer",
                 "sekretessMark",
                 "skyddadFolkBokföring",
-                "skapadDatum",
                 "uppdateradDatum"
             ) VALUES (
+                ${pers.careOf}, 
+                ${pers.utdelningsadress1},
+                ${pers.utdelningsadress2}, 
+                ${pers.postNr}, 
+                ${pers.postOrt}, 
                 ${pers.forNamn}, 
                 ${pers.mellanNamn},
                 ${pers.efterNamn}, 
@@ -106,7 +115,6 @@ service /person on new http:Listener(8080) {
                 ${pers.hanvisningsNummer}, 
                 ${pers.sekretessMark}, 
                 ${pers.skyddadFolkBokföring}, 
-                ${pers.skapadDatum}, 
                 ${pers.uppdateradDatum}
             ) RETURNING id`;
 
@@ -163,6 +171,11 @@ service /person on new http:Listener(8080) {
     // Uppdatera (PUT) en person
     resource function put uppdateraPerson(int id, person pers) returns json|error {
         sql:ParameterizedQuery query = `UPDATE person SET
+                "careOf" = ${pers.careOf},
+                "utdelningsadress1" = ${pers.utdelningsadress1},
+                "utdelningsadress2" = ${pers.utdelningsadress2},
+                "postNr" = ${pers.postNr},
+                "postOrt" = ${pers.postOrt},
                 "forNamn" = ${pers.forNamn},
                 "mellanNamn" = ${pers.mellanNamn},
                 "efterNamn" = ${pers.efterNamn},
