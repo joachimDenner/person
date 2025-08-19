@@ -12,7 +12,7 @@ servers:
 paths:
   /hamtaPerson:
     get:
-      operationId: getHamtaPerson
+      operationId: hamtaPerson
       parameters:
       - name: id
         in: query
@@ -35,7 +35,7 @@ paths:
                 $ref: '#/components/schemas/ErrorPayload'
   /skapaPerson:
     post:
-      operationId: postSkapaPerson
+      operationId: skapaPerson
       requestBody:
         content:
           application/json:
@@ -61,9 +61,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorPayload'
-  /hamtaAllaPersonerByIdAsc:
+  /hamtaAllaPersonerSortByIdAsc:
     get:
-      operationId: getHamtaAllaPersonerByIdAsc
+      operationId: hamtaAllaPersonerSortByIdAsc
       responses:
         "200":
           description: Ok
@@ -71,9 +71,9 @@ paths:
             application/json:
               schema:
                 type: object
-  /hamtaAllaPersonerByEfterNamnAsc:
+  /hamtaAllaPersonerSortByEfternamnAsc:
     get:
-      operationId: getHamtaAllaPersonerByEfterNamnAsc
+      operationId: hamtaAllaPersonerSortByEfternamnAsc
       responses:
         "200":
           description: Ok
@@ -83,7 +83,7 @@ paths:
                 type: object
   /uppdateraPerson:
     put:
-      operationId: putUppdateraPerson
+      operationId: uppdateraPerson
       parameters:
       - name: id
         in: query
@@ -118,7 +118,7 @@ paths:
                 $ref: '#/components/schemas/ErrorPayload'
   /tabortPerson:
     delete:
-      operationId: deleteTabortPerson
+      operationId: tabortPerson
       parameters:
       - name: id
         in: query
@@ -175,13 +175,13 @@ components:
       - lan
       - kommun
       - forsamling
-      - folkBokföringsDatum
-      - folkBokföringsTyp
+      - folkBokforingsDatum
+      - folkBokforingsTyp
       - typAvIdBet
       - idBet
       - hanvisningsNummer
       - sekretessMark
-      - skyddadFolkBokföring
+      - skyddadFolkBokforing
       - skapadDatum
       - uppdateradDatum
       type: object
@@ -207,9 +207,9 @@ components:
           type: string
         forsamling:
           type: string
-        folkBokföringsDatum:
+        folkBokforingsDatum:
           type: string
-        folkBokföringsTyp:
+        folkBokforingsTyp:
           type: string
         typAvIdBet:
           type: string
@@ -219,7 +219,7 @@ components:
           type: string
         sekretessMark:
           type: string
-        skyddadFolkBokföring:
+        skyddadFolkBokforing:
           type: string
         skapadDatum:
           type: string
