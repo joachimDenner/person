@@ -144,7 +144,7 @@ service /person on new http:Listener(8080) {
 
     //   Hämta (GET) alla personer by efterNamn
     resource function get hamtaAllaPersonerByEfterNamnAsc() returns json {
-        sql:ParameterizedQuery query = `SELECT * FROM person ORDER BY "efterNamn" asc`;
+        sql:ParameterizedQuery query = `SELECT * FROM person ORDER BY efterNamn asc`;
         stream<person, error?> resultStream = dbClient->query(query);
 
         person[] resultList = [];
@@ -179,7 +179,6 @@ service /person on new http:Listener(8080) {
                 "hanvisningsNummer" = ${pers.hanvisningsNummer},
                 "sekretessMark" = ${pers.sekretessMark},
                 "skyddadFolkBokföring" = ${pers.skyddadFolkBokföring},
-                "skapadDatum" = ${pers.skapadDatum},
                 "uppdateradDatum" = ${pers.uppdateradDatum}
             WHERE id = ${id}`;
 
