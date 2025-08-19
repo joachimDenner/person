@@ -5,29 +5,29 @@ import ballerina/sql;
 
 type person record {|
     int id?;
-    string careOf;
-    string utdelningsadress1;
-    string utdelningsadress2;
-    string postNr;
-    string postOrt;
-    string forNamn;
-    string mellanNamn;
-    string efterNamn;
-    string aviseringsNamn;
-    string code;
-    string kodTilltalsNamn;
-    string lan;
-    string kommun;
-    string forsamling;
-    string folkBokföringsDatum;
-    string folkBokföringsTyp;
-    string typAvIdBet;
-    string idBet;
-    string hanvisningsNummer;
-    string sekretessMark;
-    string skyddadFolkBokföring;
-    string skapadDatum;
-    string uppdateradDatum;
+    string? careOf;
+    string? utdelningsadress1;
+    string? utdelningsadress2;
+    string? postNr;
+    string? postOrt;
+    string? forNamn;
+    string? mellanNamn;
+    string? efterNamn;
+    string? aviseringsNamn;
+    string? code;
+    string? kodTilltalsNamn;
+    string? lan;
+    string? kommun;
+    string? forsamling;
+    string? folkBokforingsDatum;
+    string? folkBokforingsTyp;
+    string? typAvIdBet;
+    string? idBet;
+    string? hanvisningsNummer;
+    string? sekretessMark;
+    string? skyddadFolkBokforing;
+    string? skapadDatum;
+    string? uppdateradDatum;
 |};
 
 configurable string USER = ?;
@@ -85,13 +85,13 @@ service /person on new http:Listener(8080) {
                 "lan",
                 "kommun",
                 "forsamling",
-                "folkBokföringsDatum",
-                "folkBokföringsTyp",
+                "folkBokforingsDatum",
+                "folkBokforingsTyp",
                 "typAvIdBet",
                 "idBet",
                 "hanvisningsNummer",
                 "sekretessMark",
-                "skyddadFolkBokföring",
+                "skyddadFolkBokforing",
                 "skapadDatum",
                 "uppdateradDatum"
             ) VALUES (
@@ -109,13 +109,13 @@ service /person on new http:Listener(8080) {
                 ${pers.lan}, 
                 ${pers.kommun}, 
                 ${pers.forsamling}, 
-                ${pers.folkBokföringsDatum}, 
-                ${pers.folkBokföringsTyp}, 
+                ${pers.folkBokforingsDatum}, 
+                ${pers.folkBokforingsTyp}, 
                 ${pers.typAvIdBet}, 
                 ${pers.idBet}, 
                 ${pers.hanvisningsNummer}, 
                 ${pers.sekretessMark}, 
-                ${pers.skyddadFolkBokföring}, 
+                ${pers.skyddadFolkBokforing}, 
                 ${pers.skapadDatum},
                 ${pers.uppdateradDatum}
             ) RETURNING id`;
@@ -187,13 +187,13 @@ service /person on new http:Listener(8080) {
                 "lan" = ${pers.lan},
                 "kommun" = ${pers.kommun},
                 "forsamling" = ${pers.forsamling},
-                "folkBokföringsDatum" = ${pers.folkBokföringsDatum},
-                "folkBokföringsTyp" = ${pers.folkBokföringsTyp},
+                "folkBokforingsDatum" = ${pers.folkBokforingsDatum},
+                "folkBokforingsTyp" = ${pers.folkBokforingsTyp},
                 "typAvIdBet" = ${pers.typAvIdBet},
                 "idBet" = ${pers.idBet},
                 "hanvisningsNummer" = ${pers.hanvisningsNummer},
                 "sekretessMark" = ${pers.sekretessMark},
-                "skyddadFolkBokföring" = ${pers.skyddadFolkBokföring},
+                "skyddadFolkBokforing" = ${pers.skyddadFolkBokforing},
                 "skapadDatum" = ${pers.skapadDatum},
                 "uppdateradDatum" = ${pers.uppdateradDatum}
             WHERE id = ${id}`;
