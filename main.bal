@@ -92,6 +92,7 @@ service /person on new http:Listener(8080) {
                 "hanvisningsNummer",
                 "sekretessMark",
                 "skyddadFolkBokföring",
+                "skapadDatum",
                 "uppdateradDatum"
             ) VALUES (
                 ${pers.careOf}, 
@@ -115,6 +116,7 @@ service /person on new http:Listener(8080) {
                 ${pers.hanvisningsNummer}, 
                 ${pers.sekretessMark}, 
                 ${pers.skyddadFolkBokföring}, 
+                ${pers.skapadDatum},
                 ${pers.uppdateradDatum}
             ) RETURNING id`;
 
@@ -192,7 +194,7 @@ service /person on new http:Listener(8080) {
                 "hanvisningsNummer" = ${pers.hanvisningsNummer},
                 "sekretessMark" = ${pers.sekretessMark},
                 "skyddadFolkBokföring" = ${pers.skyddadFolkBokföring},
-                "skapadDatum" = ${pers.skapaDatum},
+                "skapadDatum" = ${pers.skapadDatum},
                 "uppdateradDatum" = ${pers.uppdateradDatum}
             WHERE id = ${id}`;
 
