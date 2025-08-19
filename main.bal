@@ -26,7 +26,7 @@ type person record {|
     string hanvisningsNummer;
     string sekretessMark;
     string skyddadFolkBokföring;
-    string skapadDatum?;
+    string skapadDatum;
     string uppdateradDatum;
 |};
 
@@ -192,6 +192,7 @@ service /person on new http:Listener(8080) {
                 "hanvisningsNummer" = ${pers.hanvisningsNummer},
                 "sekretessMark" = ${pers.sekretessMark},
                 "skyddadFolkBokföring" = ${pers.skyddadFolkBokföring},
+                "skapadDatum" = ${pers.skapaDatum},
                 "uppdateradDatum" = ${pers.uppdateradDatum}
             WHERE id = ${id}`;
 
