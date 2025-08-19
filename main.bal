@@ -26,7 +26,7 @@ type person record {|
     string hanvisningsNummer;
     string sekretessMark;
     string skyddadFolkBokföring;
-    string skapadDatum;
+    string skapadDatum ?; // Används inte vid Uppdatera.
     string uppdateradDatum;
 |};
 
