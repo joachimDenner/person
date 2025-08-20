@@ -12,7 +12,7 @@ servers:
 paths:
   /hamtaPerson:
     get:
-      operationId: hamtaPerson
+      operationId: getHamtaperson
       parameters:
       - name: id
         in: query
@@ -35,7 +35,7 @@ paths:
                 $ref: '#/components/schemas/ErrorPayload'
   /skapaPerson:
     post:
-      operationId: skapaPerson
+      operationId: postSkapaperson
       requestBody:
         content:
           application/json:
@@ -63,7 +63,7 @@ paths:
                 $ref: '#/components/schemas/ErrorPayload'
   /hamtaAllaPersonerSortByIdAsc:
     get:
-      operationId: hamtaAllaPersonerSortByIdAsc
+      operationId: getHamtaallapersonersortbyidasc
       responses:
         "200":
           description: Ok
@@ -73,7 +73,7 @@ paths:
                 type: object
   /hamtaAllaPersonerSortByEfternamnAsc:
     get:
-      operationId: hamtaAllaPersonerSortByEfternamnAsc
+      operationId: getHamtaallapersonersortbyefternamnasc
       responses:
         "200":
           description: Ok
@@ -83,7 +83,7 @@ paths:
                 type: object
   /uppdateraPerson:
     put:
-      operationId: uppdateraPerson
+      operationId: putUppdateraperson
       parameters:
       - name: id
         in: query
@@ -95,7 +95,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/anstalld'
+              $ref: '#/components/schemas/person'
         required: true
       responses:
         "200":
@@ -118,7 +118,7 @@ paths:
                 $ref: '#/components/schemas/ErrorPayload'
   /tabortPerson:
     delete:
-      operationId: tabortPerson
+      operationId: deleteTabortperson
       parameters:
       - name: id
         in: query
@@ -164,65 +164,103 @@ components:
           type: string
         method:
           type: string
-    anstalld:
+    person:
       required:
-      - forNamn
-      - mellanNamn
-      - efterNamn
       - aviseringsNamn
+      - careOf
       - code
-      - kodTilltalsNamn
-      - lan
-      - kommun
-      - forsamling
+      - efterNamn
       - folkBokforingsDatum
       - folkBokforingsTyp
-      - typAvIdBet
-      - idBet
+      - forNamn
+      - forsamling
       - hanvisningsNummer
+      - idBet
+      - kodTilltalsNamn
+      - kommun
+      - lan
+      - mellanNamn
+      - postNr
+      - postOrt
       - sekretessMark
-      - skyddadFolkBokforing
       - skapadDatum
+      - skyddadFolkBokforing
+      - typAvIdBet
       - uppdateradDatum
+      - utdelningsadress1
+      - utdelningsadress2
       type: object
       properties:
         id:
           type: integer
           format: int64
+        careOf:
+          type: string
+          nullable: true
+        utdelningsadress1:
+          type: string
+          nullable: true
+        utdelningsadress2:
+          type: string
+          nullable: true
+        postNr:
+          type: string
+          nullable: true
+        postOrt:
+          type: string
+          nullable: true
         forNamn:
           type: string
+          nullable: true
         mellanNamn:
           type: string
+          nullable: true
         efterNamn:
           type: string
+          nullable: true
         aviseringsNamn:
           type: string
+          nullable: true
         code:
           type: string
+          nullable: true
         kodTilltalsNamn:
           type: string
+          nullable: true
         lan:
           type: string
+          nullable: true
         kommun:
           type: string
+          nullable: true
         forsamling:
           type: string
+          nullable: true
         folkBokforingsDatum:
           type: string
+          nullable: true
         folkBokforingsTyp:
           type: string
+          nullable: true
         typAvIdBet:
           type: string
+          nullable: true
         idBet:
           type: string
+          nullable: true
         hanvisningsNummer:
           type: string
+          nullable: true
         sekretessMark:
           type: string
+          nullable: true
         skyddadFolkBokforing:
           type: string
+          nullable: true
         skapadDatum:
           type: string
+          nullable: true
         uppdateradDatum:
           type: string
+          nullable: true
       additionalProperties: false
