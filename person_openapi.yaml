@@ -2,46 +2,72 @@ openapi: 3.0.1
 info:
   title: Person
   version: 0.1.0
+
 servers:
-- url: "{server}:{port}/person"
-  variables:
-    server:
-      default: http://localhost
-    port:
-      default: "8080"
+  - url: "{scheme}://{host}{basePath}"
+    description: Dynamisk server-URL för lokal & Choreo
+    variables:
+      scheme:
+        default: http
+        enum:
+          - http
+          - https
+      host:
+        default: localhost:8080
+        enum:
+          - localhost:8080
+          - 6de04eb5-ff57-4d64-b80e-6284e10f8dc5-dev.e1-eu-north-azure.choreoapis.dev
+      basePath:
+        default: /person
+        enum:
+          - /person
+          - /full-stack-test-project/person/v1.0
+
 paths:
   /hamtaPerson:
     get:
       operationId: getHamtaperson
       parameters:
-      - name: id
-        in: query
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "200":
           description: Ok
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/person'
+              example:
+                id: 1
+                forNamn: "Anna"
+                mellanNamn: "Maria"
+                efterNamn: "Svensson"
+                postOrt: "Örebro"
         "400":
           description: BadRequest
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorPayload'
+
   /skapaPerson:
     post:
       operationId: postSkapaperson
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/person'
-        required: true
+            example:
+              forNamn: "Joachim"
+              efterNamn: "Denner"
+              postOrt: "Örebro"
+              postNr: "70210"
       responses:
         "201":
           description: Created
@@ -49,18 +75,22 @@ paths:
             application/json:
               schema:
                 type: object
-        "500":
-          description: InternalServerError
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorPayload'
+              example:
+                message: "Person skapad"
+                id: 42
         "400":
           description: BadRequest
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorPayload'
+        "500":
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
+
   /hamtaAllaPersonerSortByIdAsc:
     get:
       operationId: getHamtaallapersonersortbyidasc
@@ -70,7 +100,17 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  $ref: '#/components/schemas/person'
+              example:
+                - id: 1
+                  forNamn: "Anna"
+                  efterNamn: "Svensson"
+                - id: 2
+                  forNamn: "Joachim"
+                  efterNamn: "Denner"
+
   /hamtaAllaPersonerSortByEfternamnAsc:
     get:
       operationId: getHamtaallapersonersortbyefternamnasc
@@ -80,23 +120,37 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  $ref: '#/components/schemas/person'
+              example:
+                - id: 2
+                  forNamn: "Joachim"
+                  efterNamn: "Andersson"
+                - id: 1
+                  forNamn: "Anna"
+                  efterNamn: "Svensson"
+
   /uppdateraPerson:
     put:
       operationId: putUppdateraperson
       parameters:
-      - name: id
-        in: query
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/person'
-        required: true
+            example:
+              forNamn: "Joachim"
+              efterNamn: "Denner"
+              postOrt: "Stockholm"
       responses:
         "200":
           description: Ok
@@ -104,28 +158,31 @@ paths:
             application/json:
               schema:
                 type: object
+              example:
+                message: "Person uppdaterad"
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
         "500":
           description: InternalServerError
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorPayload'
-        "400":
-          description: BadRequest
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorPayload'
+
   /tabortPerson:
     delete:
       operationId: deleteTabortperson
       parameters:
-      - name: id
-        in: query
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "200":
           description: Ok
@@ -133,22 +190,25 @@ paths:
             application/json:
               schema:
                 type: object
+              example:
+                message: "Person borttagen"
         "400":
           description: BadRequest
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorPayload'
+
 components:
   schemas:
     ErrorPayload:
       required:
-      - message
-      - method
-      - path
-      - reason
-      - status
-      - timestamp
+        - message
+        - method
+        - path
+        - reason
+        - status
+        - timestamp
       type: object
       properties:
         timestamp:
@@ -164,32 +224,33 @@ components:
           type: string
         method:
           type: string
+
     person:
-      required:
-      - aviseringsNamn
-      - careOf
-      - code
-      - efterNamn
-      - folkBokforingsDatum
-      - folkBokforingsTyp
-      - forNamn
-      - forsamling
-      - hanvisningsNummer
-      - idBet
-      - kodTilltalsNamn
-      - kommun
-      - lan
-      - mellanNamn
-      - postNr
-      - postOrt
-      - sekretessMark
-      - skapadDatum
-      - skyddadFolkBokforing
-      - typAvIdBet
-      - uppdateradDatum
-      - utdelningsadress1
-      - utdelningsadress2
       type: object
+      required:
+        - aviseringsNamn
+        - careOf
+        - code
+        - efterNamn
+        - folkBokforingsDatum
+        - folkBokforingsTyp
+        - forNamn
+        - forsamling
+        - hanvisningsNummer
+        - idBet
+        - kodTilltalsNamn
+        - kommun
+        - lan
+        - mellanNamn
+        - postNr
+        - postOrt
+        - sekretessMark
+        - skapadDatum
+        - skyddadFolkBokforing
+        - typAvIdBet
+        - uppdateradDatum
+        - utdelningsadress1
+        - utdelningsadress2
       properties:
         id:
           type: integer
