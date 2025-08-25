@@ -238,7 +238,7 @@ service /person on new http:Listener(8080) {
     }
 
     //   Hämta (GET) en person mha idbet (personnummer)
-    resource function get hamtaPersonByPersonnummer(int idBet) returns json {
+    resource function get hamtaPersonByPersonnummer(string idBet) returns json {
         sql:ParameterizedQuery query = `SELECT * FROM person WHERE idbet = ${idBet}`;
         stream<person, error?> resultStream = dbClient->query(query);
 

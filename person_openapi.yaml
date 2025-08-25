@@ -26,7 +26,7 @@ servers:
 paths:
   /hamtaPerson:
     get:
-      operationId: getHamtaperson
+      operationId: getHamtaPerson
       parameters:
         - name: id
           in: query
@@ -41,12 +41,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/person'
-              example:
-                id: 1
-                forNamn: "Anna"
-                mellanNamn: "Maria"
-                efterNamn: "Svensson"
-                postOrt: "Örebro"
+              examples:
+                example1:
+                  value:
+                    id: 1
+                    forNamn: "Anna"
+                    mellanNamn: "Maria"
+                    efterNamn: "Svensson"
+                    postOrt: "Örebro"
         "400":
           description: BadRequest
           content:
@@ -55,49 +57,52 @@ paths:
                 $ref: '#/components/schemas/ErrorPayload'
 
   /hamtaPersonByPersonnummer:
-      get:
-        operationId: gethamtaPersonByPersonnummer
-        parameters:
-          - name: idBet
-            in: query
-            required: true
-            schema:
-              type: integer
-              format: int64
-        responses:
-          "200":
-            description: Ok
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/person'
-                example:
-                  idBet: 196802031512
-                  forNamn: "Anna"
-                  mellanNamn: "Maria"
-                  efterNamn: "Svensson"
-                  postOrt: "Örebro"
-          "400":
-            description: BadRequest
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorPayload'
+    get:
+      operationId: getHamtaPersonByPersonnummer
+      parameters:
+        - name: idBet
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/person'
+              examples:
+                example1:
+                  value:
+                    idBet: "196802031512"
+                    forNamn: "Anna"
+                    mellanNamn: "Maria"
+                    efterNamn: "Svensson"
+                    postOrt: "Örebro"
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
 
   /skapaPerson:
     post:
-      operationId: postSkapaperson
+      operationId: postSkapaPerson
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/person'
-            example:
-              forNamn: "Joachim"
-              efterNamn: "Denner"
-              postOrt: "Örebro"
-              postNr: "70210"
+            examples:
+              example1:
+                value:
+                  forNamn: "Joachim"
+                  efterNamn: "Denner"
+                  postOrt: "Örebro"
+                  postNr: "70210"
       responses:
         "201":
           description: Created
@@ -105,9 +110,11 @@ paths:
             application/json:
               schema:
                 type: object
-              example:
-                message: "Person skapad"
-                id: 42
+              examples:
+                example1:
+                  value:
+                    message: "Person skapad"
+                    id: 42
         "400":
           description: BadRequest
           content:
@@ -123,7 +130,7 @@ paths:
 
   /hamtaAllaPersonerSortByIdAsc:
     get:
-      operationId: getHamtaallapersonersortbyidasc
+      operationId: getHamtaAllaPersonerSortByIdAsc
       responses:
         "200":
           description: Ok
@@ -133,17 +140,25 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/person'
-              example:
-                - id: 1
-                  forNamn: "Anna"
-                  efterNamn: "Svensson"
-                - id: 2
-                  forNamn: "Joachim"
-                  efterNamn: "Denner"
+              examples:
+                example1:
+                  value:
+                    - id: 1
+                      forNamn: "Anna"
+                      efterNamn: "Svensson"
+                    - id: 2
+                      forNamn: "Joachim"
+                      efterNamn: "Denner"
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
 
   /hamtaAllaPersonerSortByEfternamnAsc:
     get:
-      operationId: getHamtaallapersonersortbyefternamnasc
+      operationId: getHamtaAllaPersonerSortByEfternamnAsc
       responses:
         "200":
           description: Ok
@@ -153,17 +168,25 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/person'
-              example:
-                - id: 2
-                  forNamn: "Joachim"
-                  efterNamn: "Andersson"
-                - id: 1
-                  forNamn: "Anna"
-                  efterNamn: "Svensson"
+              examples:
+                example1:
+                  value:
+                    - id: 2
+                      forNamn: "Joachim"
+                      efterNamn: "Andersson"
+                    - id: 1
+                      forNamn: "Anna"
+                      efterNamn: "Svensson"
+        "400":
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
 
   /uppdateraPerson:
     put:
-      operationId: putUppdateraperson
+      operationId: putUppdateraPerson
       parameters:
         - name: id
           in: query
@@ -177,10 +200,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/person'
-            example:
-              forNamn: "Joachim"
-              efterNamn: "Denner"
-              postOrt: "Stockholm"
+            examples:
+              example1:
+                value:
+                  forNamn: "Joachim"
+                  efterNamn: "Denner"
+                  postOrt: "Stockholm"
       responses:
         "200":
           description: Ok
@@ -188,8 +213,10 @@ paths:
             application/json:
               schema:
                 type: object
-              example:
-                message: "Person uppdaterad"
+              examples:
+                example1:
+                  value:
+                    message: "Person uppdaterad"
         "400":
           description: BadRequest
           content:
@@ -205,7 +232,7 @@ paths:
 
   /tabortPerson:
     delete:
-      operationId: deleteTabortperson
+      operationId: deleteTabortPerson
       parameters:
         - name: id
           in: query
@@ -220,8 +247,10 @@ paths:
             application/json:
               schema:
                 type: object
-              example:
-                message: "Person borttagen"
+              examples:
+                example1:
+                  value:
+                    message: "Person borttagen"
         "400":
           description: BadRequest
           content:
@@ -232,14 +261,14 @@ paths:
 components:
   schemas:
     ErrorPayload:
-      required:
-        - message
-        - method
-        - path
-        - reason
-        - status
-        - timestamp
       type: object
+      required:
+        - timestamp
+        - status
+        - reason
+        - message
+        - path
+        - method
       properties:
         timestamp:
           type: string
