@@ -49,6 +49,10 @@ final postgresql:Client dbClient = check new postgresql:Client(
     }
 );
 
+type bigint record {
+    
+};
+
 service /person on new http:Listener(8080) {
     //   Hämta (GET) en person
     resource function get hamtaPerson(int id) returns json {
@@ -231,5 +235,23 @@ service /person on new http:Listener(8080) {
         } else {
             return { "message": "Fel inträffade vid borttagning: " + execResult.message() };
         }
+    }
+
+    //   Hämta (GET) en person mha idbet (personnummer)
+    resource function get hamtaPersonByPersonnummer(int idBet) returns json {
+        sql:ParameterizedQuery query = `SELECT * FROM person WHERE idbet = ${idBet}`;
+        stream<person, error?> resultStream = dbClient->query(query);
+
+        person[] resultList = [];
+        error? e = resultStream.forEach(function(person row) {
+            resultList.push(row);
+        });
+
+        if e is error {
+            return {
+                "message": "Kunde inte hämta person: " + e.message()
+            };
+        }
+        return <json>resultList;
     }
 }   
