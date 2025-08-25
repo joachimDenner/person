@@ -58,7 +58,7 @@ paths:
       get:
         operationId: gethamtaPersonByPersonnummer
         parameters:
-          - name: id
+          - name: idBet
             in: query
             required: true
             schema:
@@ -72,7 +72,7 @@ paths:
                 schema:
                   $ref: '#/components/schemas/person'
                 example:
-                  id: 1
+                  idBet: 196802031512
                   forNamn: "Anna"
                   mellanNamn: "Maria"
                   efterNamn: "Svensson"
