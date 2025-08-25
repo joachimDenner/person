@@ -310,6 +310,7 @@ components:
         - uppdateradDatum
         - utdelningsadress1
         - utdelningsadress2
+        - lastevent
       properties:
         id:
           type: integer
@@ -381,6 +382,9 @@ components:
           type: string
           nullable: true
         uppdateradDatum:
+          type: string
+          nullable: true
+        lastevent:
           type: string
           nullable: true
       additionalProperties: false

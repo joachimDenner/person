@@ -28,6 +28,7 @@ type person record {|
     string? skyddadFolkBokforing;
     string? skapadDatum;
     string? uppdateradDatum;
+    string? lastevent;
 |};
 
 configurable string USER = ?;
@@ -97,7 +98,8 @@ service /person on new http:Listener(8080) {
                 sekretessmark,
                 skyddadfolkbokforing,
                 skapaddatum,
-                uppdateraddatum
+                uppdateraddatum,
+                lastevent
             ) VALUES (
                 ${pers.careOf},
                 ${pers.utdelningsadress1},
@@ -121,7 +123,8 @@ service /person on new http:Listener(8080) {
                 ${pers.sekretessMark},
                 ${pers.skyddadFolkBokforing},
                 ${pers.skapadDatum},
-                ${pers.uppdateradDatum}
+                ${pers.uppdateradDatum},
+                ${pers.lastevent}
             ) RETURNING id`;
 
         int insertedId = check dbClient->queryRow(query, int);
@@ -198,7 +201,8 @@ service /person on new http:Listener(8080) {
         hanvisningsnummer = ${pers.hanvisningsNummer},
         sekretessmark = ${pers.sekretessMark},
         skyddadfolkbokforing = ${pers.skyddadFolkBokforing},
-        uppdateraddatum = ${pers.uppdateradDatum}
+        uppdateraddatum = ${pers.uppdateradDatum},
+        lastevent = ${pers.lastevent}
         WHERE id = ${id}`;
 
         sql:ExecutionResult result = check dbClient->execute(query);
