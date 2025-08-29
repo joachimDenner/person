@@ -53,30 +53,32 @@ final postgresql:Client dbClient = check new postgresql:Client(
     }
 );
 
+
 // SKV-koppling - används i hämtning av token
-configurable string SKV_TOKEN_URL = ?;
-configurable string SKV_TOKEN_CONTENT_TYPE = ?;
-configurable string SKV_TOKEN_GRANT_TYPE = ?;
-configurable string SKV_TOKEN_SCOPE = ?;
-configurable string SKV_TOKEN_CLIENT_ID = ?;
-configurable string SKV_TOKEN_CLIENT_SECRET = ?;
-configurable string SKV_TOKEN_CLIENT_CERT_PATH = ?;
-configurable string SKV_TOKEN_CLIENT_KEY_PATH = ?;
-configurable string SKV_TOKEN_CLIENT_KEY_PASSWORD = ?;
+string SKV_TOKEN_URL = "https://sysorgoauth2.test.skatteverket.se/oauth2/v1/sysorg/token";
+string SKV_TOKEN_CONTENT_TYPE = "application/x-www-form-urlencoded;charset=UTF-8";
+string SKV_TOKEN_GRANT_TYPE = "client_credentials";
+string SKV_TOKEN_SCOPE = "fbfuppgoffakt";
+string SKV_TOKEN_CLIENT_ID = "a00b962dfdc8e743eebcf407c38ecead83bd69f7202e2f68";
+string SKV_TOKEN_CLIENT_SECRET = "da21079d64e9740442deb79c08f0041692fc6edac949cead83bd69f7202e2f68";
+# SKV_TOKEN_CLIENT_CERT_PATH = "/c/projcerts/orebrokommun/client-cert.pem"
+string SKV_TOKEN_CLIENT_CERT_PATH = "c:/projcerts/orebrokommun/client-cert.pem";
+#SKV_TOKEN_CLIENT_KEY_PATH = "/c/projcerts/orebrokommun/client_key.pem"
+string SKV_TOKEN_CLIENT_KEY_PATH = "c:/projcerts/orebrokommun/client_key.pem";
+string SKV_TOKEN_CLIENT_KEY_PASSWORD = "your_key_password";
 
 // Skatteverket API - används i hämtning av persondata
-configurable string SKV_API_URL = ?;
-configurable string SKV_API_CONTENT_TYPE = ?;
-configurable string SKV_API_AUTHORIZATION = ?;
-configurable string SKV_API_CLIENT_CORRELATION_ID = ?;
-configurable string SKV_API_CLIENT_ID = ?;
-configurable string SKV_API_CLIENT_SECRET = ?;
-configurable json SKV_API_BODY = ?;
+//string SKV_API_URL = "https://api.test.skatteverket.se/folkbokforing/folkbokforingsuppgifter-for-offentliga-aktorer/v3/hamta";
+//string SKV_API_CONTENT_TYPE = "application/json";
+//string SKV_API_AUTHORIZATION = "Bearer <access_token>";
+//string SKV_API_CLIENT_CORRELATION_ID = "78b82991-6122-4933-bf18-ccfc75b3e199";
+//string SKV_API_CLIENT_ID = "c7b3346b-06fe-4e48-8a9e-bb8bed786c8a";
+//string SKV_API_CLIENT_SECRET = "a0562b37-8514-47b4-952e-d53f0499c054";
+
 
 // HTTP-klienter
 //http:Client skvTokenClient = check new (SKV_TOKEN_URL);
-http:Client skvApiClient = check new (SKV_API_URL);
-
+//http:Client skvApiClient = check new (SKV_API_URL);
 
 
 service /person on new http:Listener(8080) {
