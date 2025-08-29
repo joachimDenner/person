@@ -1,5 +1,35 @@
+# Databas connection
 HOST = "ep-twilight-darkness-a93wnhjw-pooler.gwc.azure.neon.tech"
 PORT = 5432
 USER = "neondb_owner"
 PASSWORD = "npg_hgGofDq81sXy"
 DATABASE = "my_test_db_in_neon"
+
+# Skatteverket API - Token
+SKV_TOKEN_URL = "https://sysorgoauth2.test.skatteverket.se/oauth2/v1/sysorg/token"
+SKV_TOKEN_CONTENT_TYPE = "application/x-www-form-urlencoded;charset=UTF-8"
+SKV_TOKEN_GRANT_TYPE = "client_credentials"
+SKV_TOKEN_SCOPE = "fbfuppgoffakt"
+SKV_TOKEN_CLIENT_ID = "a00b962dfdc8e743eebcf407c38ecead83bd69f7202e2f68"
+SKV_TOKEN_CLIENT_SECRET = "da21079d64e9740442deb79c08f0041692fc6edac949cead83bd69f7202e2f68"
+# SKV_TOKEN_CLIENT_CERT_PATH = "/c/projcerts/orebrokommun/client-cert.pem"
+SKV_TOKEN_CLIENT_CERT_PATH = "c:/projcerts/orebrokommun/client-cert.pem"
+#SKV_TOKEN_CLIENT_KEY_PATH = "/c/projcerts/orebrokommun/client_key.pem"
+SKV_TOKEN_CLIENT_KEY_PATH = "c:/projcerts/orebrokommun/client_key.pem"
+SKV_TOKEN_CLIENT_KEY_PASSWORD = "your_key_password"
+
+
+# Skatteverket API - General
+SKV_API_URL = "https://api.test.skatteverket.se/folkbokforing/folkbokforingsuppgifter-for-offentliga-aktorer/v3/hamta"
+SKV_API_CONTENT_TYPE = "application/json"
+SKV_API_AUTHORIZATION = "Bearer <access_token>"
+SKV_API_CLIENT_CORRELATION_ID = "78b82991-6122-4933-bf18-ccfc75b3e199"
+SKV_API_CLIENT_ID = "c7b3346b-06fe-4e48-8a9e-bb8bed786c8a"
+SKV_API_CLIENT_SECRET = "a0562b37-8514-47b4-952e-d53f0499c054"
+
+[SKV_API_BODY.bestallning]
+organisationsnummer = "162021004748"
+bestallningsidentitet = "00000236-FO01-0002"
+
+[[SKV_API_BODY.sokvillkor]]
+identitetsbeteckning = "191706199260"
