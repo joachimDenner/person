@@ -112,14 +112,17 @@ service /person on new http:Listener(8080) {
     resource function get skvToken() returns json|error {
         http:Client skvClient = check new(SKV_TOKEN_URL, {
             secureSocket: {
-                cert: {
-                    path: "c:/projcerts/orebrokommun/client-cert.pem",
-                    password: SKV_TOKEN_CLIENT_KEY_PASSWORD
-                },
                 key: {
-                    path: "c:/projcerts/orebrokommun/client-key.pem",
-                    password: SKV_TOKEN_CLIENT_KEY_PASSWORD
-                }
+                    certFile: "c:/projcerts/orebrokommun/client-cert.crt",
+                    keyFile: "c:/projcerts/orebrokommun/client-key.key"
+                },
+                cert: "c:/projcerts/orebrokommun/client-cert.crt",
+                protocol: {
+                    name: http:TLS,
+                    versions: ["TLSv1.2", "TLSv1.1"]
+                },
+
+                ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
             }
         });
 
