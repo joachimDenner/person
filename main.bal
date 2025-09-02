@@ -5,6 +5,7 @@ import ballerina/sql;
 import ballerina/log;
 import ballerina/os;
 
+
 type person record {|
     int id?;
     string? careOf;
@@ -53,19 +54,12 @@ final postgresql:Client dbClient = check new postgresql:Client(
     }
 );
 
-
-// SKV-koppling - används i hämtning av token
-string SKV_TOKEN_URL = "https://sysorgoauth2.test.skatteverket.se/oauth2/v1/sysorg/token";
-string SKV_TOKEN_CONTENT_TYPE = "application/x-www-form-urlencoded;charset=UTF-8";
-string SKV_TOKEN_GRANT_TYPE = "client_credentials";
-string SKV_TOKEN_SCOPE = "fbfuppgoffakt";
-string SKV_TOKEN_CLIENT_ID = "a00b962dfdc8e743eebcf407c38ecead83bd69f7202e2f68";
-string SKV_TOKEN_CLIENT_SECRET = "da21079d64e9740442deb79c08f0041692fc6edac949cead83bd69f7202e2f68";
-# SKV_TOKEN_CLIENT_CERT_PATH = "/c/projcerts/orebrokommun/client-cert.pem"
-string SKV_TOKEN_CLIENT_CERT_PATH = "c:/projcerts/orebrokommun/client-cert.pem";
-#SKV_TOKEN_CLIENT_KEY_PATH = "/c/projcerts/orebrokommun/client_key.pem"
-string SKV_TOKEN_CLIENT_KEY_PATH = "c:/projcerts/orebrokommun/client_key.pem";
-string SKV_TOKEN_CLIENT_KEY_PASSWORD = "your_key_password";
+// SKV token variabler
+configurable string SKV_TOKEN_URL = ?;
+configurable string SKV_TOKEN_CLIENT_ID = ?;
+configurable string SKV_TOKEN_CLIENT_SECRET = ?;
+configurable string SKV_TOKEN_CERTFILE = ?;
+configurable string SKV_TOKEN_KEYFILE = ?;
 
 // Skatteverket API - används i hämtning av persondata
 //string SKV_API_URL = "https://api.test.skatteverket.se/folkbokforing/folkbokforingsuppgifter-for-offentliga-aktorer/v3/hamta";
@@ -109,48 +103,84 @@ service /person on new http:Listener(8080) {
     }
 
     // Hämta token från Skatteverket
-    resource function get skvToken() returns json|error {
-        http:Client skvClient = check new(SKV_TOKEN_URL, {
-            secureSocket: {
-                key: {
-                    certFile: "c:/projcerts/orebrokommun/client-cert.crt",
-                    keyFile: "c:/projcerts/orebrokommun/client-key.key"
-                },
-                cert: "c:/projcerts/orebrokommun/client-cert.crt",
-                protocol: {
-                    name: http:TLS,
-                    versions: ["TLSv1.2", "TLSv1.1"]
-                },
-
-                ciphers: ["TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA"]
-            }
-        });
-
-        map<string> formData = {
-            grant_type: "client_credentials",
-            scope: "fbfuppgoffakt",
-            client_id: SKV_TOKEN_CLIENT_ID,
-            client_secret: SKV_TOKEN_CLIENT_SECRET
-        };
-
+    resource function get skvToken() returns json {
+        // 1. Skapa request och sätt header
+        // Motsvaras av -H "Content-Type: application/x-www-form-urlencoded" i cURL
         http:Request req = new;
-        req.setHeader("Accept", "application/json");
-        req.setPayload(formData, contentType = "application/x-www-form-urlencoded");
+        req.setHeader("Content-Type", "application/x-www-form-urlencoded");
         
-        http:Response tokenResp = check skvClient->post("", req);
+        // 2. Förbered request-data NOT: Måste ligga på EN rad i denna kod även om den i cURL kan ligga på fler rader!!
+        // Motsvaras av --data i cURL
+        string formData = "grant_type=client_credentials"
+            + "&client_id=" + SKV_TOKEN_CLIENT_ID
+            + "&client_secret=" + SKV_TOKEN_CLIENT_SECRET;
 
-        if tokenResp.statusCode == 200 {
-            json|error tokenJson = tokenResp.getJsonPayload();
-            if tokenJson is json {
-                log:printInfo("Token hämtad");
-                return tokenJson;
-            } else {
-                log:printError("Kunde inte tolka JSON: " + tokenJson.toString());
-                return error("Kunde inte tolka JSON från Skatteverket");
-            }
+        // 3. Lägg på formData på payload   
+        req.setPayload(formData);
+
+        // 4. Förbered debug-loggning om error
+        // Hämta Content-Type-headern, eller fallback om den saknas
+        string contentTypeHeader = "";
+        string|http:HeaderNotFoundError h = req.getHeader("Content-Type");
+        if h is string {
+            contentTypeHeader = h;
         } else {
-            log:printError("Skatteverket svarade med status: " + tokenResp.statusCode.toString());
-            return error("Token-anrop misslyckades med status " + tokenResp.statusCode.toString());
+            contentTypeHeader = "Header saknas";
+        }
+
+        // 5. Bygg på debug-strängen
+        string requestDebug = string `url=${SKV_TOKEN_URL}, headers=${contentTypeHeader}, payload=${formData}`;
+
+        do {
+            http:Client skvClient = check new(SKV_TOKEN_URL, {
+                secureSocket: {
+                    key: {
+                        certFile: SKV_TOKEN_CERTFILE,
+                        keyFile: SKV_TOKEN_KEYFILE
+                    },
+                    protocol: { name: http:TLS, versions: ["TLSv1.2"] },
+                    ciphers: [
+                        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+                        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+                    ]
+                }
+            });
+
+            // 6. Skicka POST-anrop
+            http:Response tokenResp = check skvClient->post("", req);
+
+            if tokenResp.statusCode == 200 {
+                json|error tokenJson = tokenResp.getJsonPayload();
+                if tokenJson is json {
+                    log:printInfo("Token hämtad");
+                    return tokenJson;
+                } else {
+                    fail error("1) requestDebug: " + requestDebug);
+                }
+            } else {
+                // Försök hämta respons som JSON
+                json|error errorJson = tokenResp.getJsonPayload();
+                if errorJson is json {
+                    fail error("Skatteverket svarade med status: " + tokenResp.statusCode.toString() + ", 2) requestDebug: " + requestDebug);
+                } else {
+                    // Om inte JSON, hämta textpayload
+                    string|error errorText = tokenResp.getTextPayload();
+                    if errorText is string {
+                        fail error("Skatteverket svarade med status: " + tokenResp.statusCode.toString()
+                                + " och payload: " + errorText + ", 3) requestDebug: " + requestDebug);
+                    } else {
+                        fail error("Skatteverket svarade med status: " + tokenResp.statusCode.toString()
+                                + " men kunde inte läsa payload" + ", 4) requestDebug: " + requestDebug);
+                    }
+                }
+            }
+        } on fail error e {
+            return {
+                "status": 500,
+                "error": e.message(),
+                "stackTrace": e.stackTrace().toString(),
+                "request": requestDebug
+            };
         }
     }
 
