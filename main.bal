@@ -4,7 +4,7 @@ import ballerinax/postgresql.driver as _;
 import ballerina/sql;
 import ballerina/log;
 import ballerina/os;
-
+import ballerina/uuid;
 
 type person record {|
     int id?;
@@ -54,55 +54,21 @@ final postgresql:Client dbClient = check new postgresql:Client(
     }
 );
 
-// SKV token variabler
+// Steg 1 - SKV token variabler
 configurable string SKV_TOKEN_URL = ?;
 configurable string SKV_TOKEN_CLIENT_ID = ?;
 configurable string SKV_TOKEN_CLIENT_SECRET = ?;
 configurable string SKV_TOKEN_CERTFILE = ?;
 configurable string SKV_TOKEN_KEYFILE = ?;
 
-// Skatteverket API - används i hämtning av persondata
-//string SKV_API_URL = "https://api.test.skatteverket.se/folkbokforing/folkbokforingsuppgifter-for-offentliga-aktorer/v3/hamta";
-//string SKV_API_CONTENT_TYPE = "application/json";
-//string SKV_API_AUTHORIZATION = "Bearer <access_token>";
-//string SKV_API_CLIENT_CORRELATION_ID = "78b82991-6122-4933-bf18-ccfc75b3e199";
-//string SKV_API_CLIENT_ID = "c7b3346b-06fe-4e48-8a9e-bb8bed786c8a";
-//string SKV_API_CLIENT_SECRET = "a0562b37-8514-47b4-952e-d53f0499c054";
-
-
-// HTTP-klienter
-//http:Client skvTokenClient = check new (SKV_TOKEN_URL);
-//http:Client skvApiClient = check new (SKV_API_URL);
-
+// Steg 2 - Skatteverket API - används i hämtning av persondata
+configurable string SKV_API_URL = ?;
+configurable string SKV_API_CLIENT_ID = ?;
+configurable string SKV_API_CLIENT_SECRET = ?;
 
 service /person on new http:Listener(8080) {
-
-    resource function get checkEnv() returns json {
-        string? choreoVar = os:getEnv("CHOREO_API_URL");
-        string? k8sVar = os:getEnv("KUBERNETES_SERVICE_HOST");
-
-        if choreoVar is string && choreoVar.trim() != "" {
-            return {
-                "environment": "Choreo",
-                "variable": "CHOREO_API_URL",
-                "value": choreoVar
-            };
-        } else if k8sVar is string && k8sVar.trim() != "" {
-            return {
-                "environment": "Kubernetes",
-                "variable": "KUBERNETES_SERVICE_HOST",
-                "value": k8sVar
-            };
-        } else {
-            return {
-                "environment": "Local",
-                "variable": "N/A",
-                "value": "N/A"
-            };
-        }
-    }
-
-    // Hämta token från Skatteverket
+    
+    // Steg 1 - Hämta token från Skatteverket
     resource function get skvToken() returns json {
         // 1. Skapa request och sätt header
         // Motsvaras av -H "Content-Type: application/x-www-form-urlencoded" i cURL
@@ -184,7 +150,104 @@ service /person on new http:Listener(8080) {
         }
     }
 
-    //   Hämta (GET) en person
+    // Steg 2 - Skapa en ny GUID. Att användas i SKV api
+    resource function get getNewGUID() returns json {
+        string guid = uuid:createType4AsString();
+        return { "guid": guid };
+    }
+
+    
+    // Steg 3 - Hämta (GET) en personpost ifrån SKV
+    // PersonNr: Ange ett personnummer som skall hämtas. I ett format som SKV's api vill ha det.
+    // skvAccessToken: Access-token som hämtats i steg 1.     
+    // skvCorrelationId: GUID som hämtats i steg 2.
+    
+    resource function get hamtaPersonFranSKV(string personNr, string skvAccessToken, string skvCorrelationId) returns json {
+        do {
+            // 1. Skapa request och sätt header
+            http:Request req = new;
+
+            // 2. Bygg header
+            req.setHeader("Content-Type", "application/json");
+            req.setHeader("Authorization", "Bearer " + skvAccessToken);
+            req.setHeader("skv_client_correlation_id", skvCorrelationId);
+            req.setHeader("client_id", SKV_API_CLIENT_ID);
+            req.setHeader("client_secret", SKV_API_CLIENT_SECRET);
+
+            // 3. Förbered payload NOT: Måste ligga på EN rad i denna kod även om den i cURL kan ligga på fler rader!!
+            // Motsvaras av --data i cURL
+            string formData = "{\"bestallning\":{\"organisationsnummer\":162021004748,\"bestallningsidentitet\":\"00000236-FO01-0001\"},\"sokvillkor\":[{\"identitetsbeteckning\":" + personNr + "}]}";
+
+            // 5. Lägg på formData på payload
+            req.setPayload(formData);
+
+            http:Client skvClient = check new(SKV_API_URL);
+
+            // 8. Skicka POST-anrop
+            http:Response personResp = check skvClient->post("", req);
+
+            if personResp.statusCode == 200 {
+                json|error personJson = personResp.getJsonPayload();
+                if personJson is json {
+                    log:printInfo("Person hämtad");
+                    return personJson;
+                } else {
+                    fail error("1) requestDebug: N/A");
+                }
+            } else {
+                // Försök hämta respons som JSON
+                json|error errorJson = personResp.getJsonPayload();
+                if errorJson is json {
+                    fail error("Skatteverket svarade med status: " + personResp.statusCode.toString() + ", 2) requestDebug: N/A");
+                } else {
+                    // Om inte JSON, hämta textpayload
+                    string|error errorText = personResp.getTextPayload();
+                    if errorText is string {
+                        fail error("Skatteverket svarade med status: " + personResp.statusCode.toString()
+                                + " och payload: " + errorText + ", 3) requestDebug: N/A");
+                    } else {
+                        fail error("Skatteverket svarade med status: " + personResp.statusCode.toString()
+                                + " men kunde inte läsa payload" + ", 4) requestDebug: N/A");
+                    }
+                }
+            }
+        } on fail error e {
+            return {
+                "status": 500,
+                "error": e.message(),
+                "stackTrace": e.stackTrace().toString(),
+                "request": "N/A"
+            };
+        }
+    }
+
+    // Vilken miljö kör vi i? Lokalt eller Kubernetes?
+    resource function get checkEnv() returns json {
+        string? choreoVar = os:getEnv("CHOREO_API_URL");
+        string? k8sVar = os:getEnv("KUBERNETES_SERVICE_HOST");
+
+        if choreoVar is string && choreoVar.trim() != "" {
+            return {
+                "environment": "Choreo",
+                "variable": "CHOREO_API_URL",
+                "value": choreoVar
+            };
+        } else if k8sVar is string && k8sVar.trim() != "" {
+            return {
+                "environment": "Kubernetes",
+                "variable": "KUBERNETES_SERVICE_HOST",
+                "value": k8sVar
+            };
+        } else {
+            return {
+                "environment": "Local",
+                "variable": "N/A",
+                "value": "N/A"
+            };
+        }
+    }
+
+    //   Hämta (GET) en person by id
     resource function get hamtaPerson(int id) returns json {
         sql:ParameterizedQuery query = `SELECT * FROM person WHERE id = ${id}`;
         stream<person, error?> resultStream = dbClient->query(query);

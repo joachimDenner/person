@@ -1,40 +1,87 @@
 openapi: 3.0.3
 info:
   title: Person API
+  description: API för hantering av personposter och integration med Skatteverket.
   version: "1.0.0"
-  description: API för hantering av personer (CRUD + extra endpoints).
+
 servers:
   - url: http://localhost:8080/person
-paths:
-  /checkEnv:
-    get:
-      summary: Kontrollera miljö
-      responses:
-        '200':
-          description: Miljöinformation
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  environment: "Local"
-                  variable: "N/A"
-                  value: "N/A"
 
+paths:
   /skvToken:
     get:
-      summary: Hämta token från Skatteverket
+      summary: Steg 1 - Hämta access-token från Skatteverket
       responses:
         '200':
-          description: Token-data
+          description: Token hämtad
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  access_token: "eyJhbGciOiJIUzI1..."
-                  token_type: "Bearer"
+                  access_token: string
+                  token_type: bearer
                   expires_in: 3600
+
+  /getNewGUID:
+    get:
+      summary: Steg 2 Skapa en ny GUID
+      responses:
+        '200':
+          description: Ny GUID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  guid:
+                    type: string
+                    format: uuid
+
+  /hamtaPersonFranSKV:
+    get:
+      summary: Steg 3 - Hämta persondata från Skatteverket mha hämtad token i steg 1, och skapad GUID i steg 2
+      parameters:
+        - in: query
+          name: personNr
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: skvAccessToken
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: skvCorrelationId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Persondata
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /checkEnv:
+    get:
+      summary: Kontrollera vilken miljö tjänsten kör i
+      responses:
+        '200':
+          description: Miljöinfo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  environment:
+                    type: string
+                  variable:
+                    type: string
+                  value:
+                    type: string
 
   /hamtaPerson:
     get:
@@ -47,7 +94,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: En person
+          description: Person hittad
           content:
             application/json:
               schema:
@@ -62,33 +109,25 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Person'
-            example:
-              careOf: "c/o Andersson"
-              utdelningsadress1: "Storgatan 1"
-              postNr: "70364"
-              postOrt: "Örebro"
-              forNamn: "Anna"
-              efterNamn: "Karlsson"
-              idBet: "8503231234"
-              skapadDatum: "2025-09-01"
-              uppdateradDatum: "2025-09-01"
       responses:
         '200':
-          description: Bekräftelse på skapad person
+          description: Person skapad
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  message: "Person skapades!"
-                  id: 42
+                properties:
+                  message:
+                    type: string
+                  id:
+                    type: integer
 
   /hamtaAllaPersonerSortByIdAsc:
     get:
-      summary: Hämta alla personer sorterade på id (stigande)
+      summary: Hämta alla personer sorterat på ID
       responses:
         '200':
-          description: Lista av personer
+          description: Lista med personer
           content:
             application/json:
               schema:
@@ -98,10 +137,10 @@ paths:
 
   /hamtaAllaPersonerSortByEfternamnAsc:
     get:
-      summary: Hämta alla personer sorterade på efternamn (stigande)
+      summary: Hämta alla personer sorterat på efternamn
       responses:
         '200':
-          description: Lista av personer
+          description: Lista med personer
           content:
             application/json:
               schema:
@@ -111,7 +150,7 @@ paths:
 
   /uppdateraPerson:
     put:
-      summary: Uppdatera en person
+      summary: Uppdatera en person via ID
       parameters:
         - in: query
           name: id
@@ -124,25 +163,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Person'
-            example:
-              forNamn: "Anna"
-              efterNamn: "Karlsson"
-              postOrt: "Stockholm"
-              uppdateradDatum: "2025-09-02"
       responses:
         '200':
-          description: Bekräftelse på uppdatering
+          description: Person uppdaterad
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  message: "Person uppdaterades!"
-                  id: 42
+                properties:
+                  message:
+                    type: string
+                  id:
+                    type: integer
 
   /tabortPerson:
     delete:
-      summary: Ta bort en person
+      summary: Ta bort en person via ID
       parameters:
         - in: query
           name: id
@@ -151,17 +187,18 @@ paths:
             type: integer
       responses:
         '200':
-          description: Bekräftelse på borttagning
+          description: Resultat av borttagning
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  message: "Person med id: 42 borttagen!"
+                properties:
+                  message:
+                    type: string
 
   /hamtaPersonByPersonnummer:
     get:
-      summary: Hämta en person via personnummer
+      summary: Hämta en person via personnummer (idBet)
       parameters:
         - in: query
           name: idBet
@@ -170,7 +207,7 @@ paths:
             type: string
       responses:
         '200':
-          description: En person
+          description: Person hittad
           content:
             application/json:
               schema:
@@ -183,7 +220,6 @@ components:
       properties:
         id:
           type: integer
-          example: 42
         careOf:
           type: string
         utdelningsadress1:
@@ -214,7 +250,6 @@ components:
           type: string
         folkBokforingsDatum:
           type: string
-          format: date
         folkBokforingsTyp:
           type: string
         typAvIdBet:
@@ -229,9 +264,7 @@ components:
           type: string
         skapadDatum:
           type: string
-          format: date
         uppdateradDatum:
           type: string
-          format: date
         lastevent:
           type: string
