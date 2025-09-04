@@ -68,158 +68,83 @@ configurable string SKV_API_CLIENT_SECRET = ?;
 
 service /person on new http:Listener(8080) {
     
-    // Steg 1 - Hämta token från Skatteverket
-    resource function get skvToken() returns json {
-        // 1. Skapa request och sätt header
-        // Motsvaras av -H "Content-Type: application/x-www-form-urlencoded" i cURL
-        http:Request req = new;
-        req.setHeader("Content-Type", "application/x-www-form-urlencoded");
-        
-        // 2. Förbered request-data NOT: Måste ligga på EN rad i denna kod även om den i cURL kan ligga på fler rader!!
-        // Motsvaras av --data i cURL
-        string formData = "grant_type=client_credentials"
-            + "&client_id=" + SKV_TOKEN_CLIENT_ID
-            + "&client_secret=" + SKV_TOKEN_CLIENT_SECRET;
+    resource function get hamtaTokenAndGUIDAndPerson(string personNr) returns json {
+        string skvAccessToken = "";
+        string skvCorrelationId = "";
 
-        // 3. Lägg på formData på payload   
-        req.setPayload(formData);
-
-        // 4. Förbered debug-loggning om error
-        // Hämta Content-Type-headern, eller fallback om den saknas
-        string contentTypeHeader = "";
-        string|http:HeaderNotFoundError h = req.getHeader("Content-Type");
-        if h is string {
-            contentTypeHeader = h;
+        // 1A. Hämta access token
+        json|error accessTokenRes = skvToken();
+        if accessTokenRes is error {
+            return {
+                status: 500,
+                message: "Misslyckades att hämta access token",
+                detail: accessTokenRes.message()
+            };
+        }
+        // 1B. Kontrollera att det är ett objekt (map)
+        if accessTokenRes is map<json> {
+            map<json> accessTokenMap = accessTokenRes;
+            if accessTokenMap["access_token"] is string {
+                skvAccessToken = <string>accessTokenMap["access_token"];
+            } else {
+                return {
+                    status: 500,
+                    message: "access_token saknas i svaret"
+                };
+            }
         } else {
-            contentTypeHeader = "Header saknas";
-        }
-
-        // 5. Bygg på debug-strängen
-        string requestDebug = string `url=${SKV_TOKEN_URL}, headers=${contentTypeHeader}, payload=${formData}`;
-
-        do {
-            http:Client skvClient = check new(SKV_TOKEN_URL, {
-                secureSocket: {
-                    key: {
-                        certFile: SKV_TOKEN_CERTFILE,
-                        keyFile: SKV_TOKEN_KEYFILE
-                    },
-                    protocol: { name: http:TLS, versions: ["TLSv1.2"] },
-                    ciphers: [
-                        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-                        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
-                    ]
-                }
-            });
-
-            // 6. Skicka POST-anrop
-            http:Response tokenResp = check skvClient->post("", req);
-
-            if tokenResp.statusCode == 200 {
-                json|error tokenJson = tokenResp.getJsonPayload();
-                if tokenJson is json {
-                    log:printInfo("Token hämtad");
-                    return tokenJson;
-                } else {
-                    fail error("1) requestDebug: " + requestDebug);
-                }
-            } else {
-                // Försök hämta respons som JSON
-                json|error errorJson = tokenResp.getJsonPayload();
-                if errorJson is json {
-                    fail error("Skatteverket svarade med status: " + tokenResp.statusCode.toString() + ", 2) requestDebug: " + requestDebug);
-                } else {
-                    // Om inte JSON, hämta textpayload
-                    string|error errorText = tokenResp.getTextPayload();
-                    if errorText is string {
-                        fail error("Skatteverket svarade med status: " + tokenResp.statusCode.toString()
-                                + " och payload: " + errorText + ", 3) requestDebug: " + requestDebug);
-                    } else {
-                        fail error("Skatteverket svarade med status: " + tokenResp.statusCode.toString()
-                                + " men kunde inte läsa payload" + ", 4) requestDebug: " + requestDebug);
-                    }
-                }
-            }
-        } on fail error e {
             return {
-                "status": 500,
-                "error": e.message(),
-                "stackTrace": e.stackTrace().toString(),
-                "request": requestDebug
+                status: 500,
+                message: "Felaktigt format på accessToken"
             };
         }
-    }
 
-    // Steg 2 - Skapa en ny GUID. Att användas i SKV api
-    resource function get getNewGUID() returns json {
-        string guid = uuid:createType4AsString();
-        return { "guid": guid };
-    }
-
-    
-    // Steg 3 - Hämta (GET) en personpost ifrån SKV
-    // PersonNr: Ange ett personnummer som skall hämtas. I ett format som SKV's api vill ha det.
-    // skvAccessToken: Access-token som hämtats i steg 1.     
-    // skvCorrelationId: GUID som hämtats i steg 2.
-    
-    resource function get hamtaPersonFranSKV(string personNr, string skvAccessToken, string skvCorrelationId) returns json {
-        do {
-            // 1. Skapa request och sätt header
-            http:Request req = new;
-
-            // 2. Bygg header
-            req.setHeader("Content-Type", "application/json");
-            req.setHeader("Authorization", "Bearer " + skvAccessToken);
-            req.setHeader("skv_client_correlation_id", skvCorrelationId);
-            req.setHeader("client_id", SKV_API_CLIENT_ID);
-            req.setHeader("client_secret", SKV_API_CLIENT_SECRET);
-
-            // 3. Förbered payload NOT: Måste ligga på EN rad i denna kod även om den i cURL kan ligga på fler rader!!
-            // Motsvaras av --data i cURL
-            string formData = "{\"bestallning\":{\"organisationsnummer\":162021004748,\"bestallningsidentitet\":\"00000236-FO01-0001\"},\"sokvillkor\":[{\"identitetsbeteckning\":" + personNr + "}]}";
-
-            // 5. Lägg på formData på payload
-            req.setPayload(formData);
-
-            http:Client skvClient = check new(SKV_API_URL);
-
-            // 8. Skicka POST-anrop
-            http:Response personResp = check skvClient->post("", req);
-
-            if personResp.statusCode == 200 {
-                json|error personJson = personResp.getJsonPayload();
-                if personJson is json {
-                    log:printInfo("Person hämtad");
-                    return personJson;
-                } else {
-                    fail error("1) requestDebug: N/A");
-                }
-            } else {
-                // Försök hämta respons som JSON
-                json|error errorJson = personResp.getJsonPayload();
-                if errorJson is json {
-                    fail error("Skatteverket svarade med status: " + personResp.statusCode.toString() + ", 2) requestDebug: N/A");
-                } else {
-                    // Om inte JSON, hämta textpayload
-                    string|error errorText = personResp.getTextPayload();
-                    if errorText is string {
-                        fail error("Skatteverket svarade med status: " + personResp.statusCode.toString()
-                                + " och payload: " + errorText + ", 3) requestDebug: N/A");
-                    } else {
-                        fail error("Skatteverket svarade med status: " + personResp.statusCode.toString()
-                                + " men kunde inte läsa payload" + ", 4) requestDebug: N/A");
-                    }
-                }
-            }
-        } on fail error e {
+        // 2A. Hämta nytt GUID
+        json|error newGuidRes = getNewGUID();
+        if newGuidRes is error {
             return {
-                "status": 500,
-                "error": e.message(),
-                "stackTrace": e.stackTrace().toString(),
-                "request": "N/A"
+                status: 500,
+                message: "Misslyckades att hämta GUID",
+                detail: newGuidRes.message()
             };
         }
+
+        // 2B. Kontrollera att det är ett objekt (map)
+        if newGuidRes is map<json> {
+            map<json> newGuidMap = newGuidRes;
+            if newGuidMap["guid"] is string {
+                skvCorrelationId = <string>newGuidMap["guid"];
+            } else {
+                return {
+                    status: 500,
+                    message: "GUID saknas i svaret"
+                };
+            }
+        } else {
+            return {
+                status: 500,
+                message: "Felaktigt format på newGuid"
+            };
+        }
+        // Hämta persondata
+        json|error personDataRes = hamtaPersonFranSKV(personNr, skvAccessToken, skvCorrelationId);
+        if personDataRes is error {
+            return {
+                status: 500,
+                message: "Misslyckades att hämta persondata",
+                detail: personDataRes.message()
+            };
+        }
+
+        json personData = <json>personDataRes;
+        return {
+            status: 200,
+            guid: skvCorrelationId,
+            token: skvAccessToken,
+            person: personData
+        };
     }
+
 
     // Vilken miljö kör vi i? Lokalt eller Kubernetes?
     resource function get checkEnv() returns json {
@@ -453,3 +378,154 @@ service /person on new http:Listener(8080) {
         return <json>resultList;
     }
 }   
+
+// Steg 1 - Hämta token från Skatteverket
+function skvToken() returns json {
+    // 1. Skapa request och sätt header
+    // Motsvaras av -H "Content-Type: application/x-www-form-urlencoded" i cURL
+    http:Request req = new;
+    req.setHeader("Content-Type", "application/x-www-form-urlencoded");
+     
+    // 2. Förbered request-data NOT: Måste ligga på EN rad i denna kod även om den i cURL kan ligga på fler rader!!
+    // Motsvaras av --data i cURL
+    string formData = "grant_type=client_credentials"
+        + "&client_id=" + SKV_TOKEN_CLIENT_ID
+        + "&client_secret=" + SKV_TOKEN_CLIENT_SECRET;
+
+    // 3. Lägg på formData på payload   
+    req.setPayload(formData);
+
+    // 4. Förbered debug-loggning om error
+    // Hämta Content-Type-headern, eller fallback om den saknas
+    string contentTypeHeader = "";
+    string|http:HeaderNotFoundError h = req.getHeader("Content-Type");
+    if h is string {
+        contentTypeHeader = h;
+    } else {
+        contentTypeHeader = "Header saknas";
+    }
+
+    // 5. Bygg på debug-strängen
+    string requestDebug = string `url=${SKV_TOKEN_URL}, headers=${contentTypeHeader}, payload=${formData}`;
+
+    do {
+        http:Client skvClient = check new(SKV_TOKEN_URL, {
+            secureSocket: {
+                key: {
+                    certFile: SKV_TOKEN_CERTFILE,
+                    keyFile: SKV_TOKEN_KEYFILE
+                },
+                protocol: { name: http:TLS, versions: ["TLSv1.2"] },
+                ciphers: [
+                    "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+                    "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+                ]
+            }
+        });
+
+        // 6. Skicka POST-anrop
+        http:Response tokenResp = check skvClient->post("", req);
+        if tokenResp.statusCode == 200 {
+            json|error tokenJson = tokenResp.getJsonPayload();
+            if tokenJson is json {
+                log:printInfo("Token hämtad");
+                return tokenJson;
+            } else {
+                fail error("1) requestDebug: " + requestDebug);
+            }
+        } else {
+            // Försök hämta respons som JSON
+            json|error errorJson = tokenResp.getJsonPayload();
+            if errorJson is json {
+                fail error("Skatteverket svarade med status: " + tokenResp.statusCode.toString() + ", 2) requestDebug: " + requestDebug);
+            } else {
+                // Om inte JSON, hämta textpayload
+                string|error errorText = tokenResp.getTextPayload();
+                if errorText is string {
+                    fail error("Skatteverket svarade med status: " + tokenResp.statusCode.toString()
+                            + " och payload: " + errorText + ", 3) requestDebug: " + requestDebug);
+                } else {
+                    fail error("Skatteverket svarade med status: " + tokenResp.statusCode.toString()
+                            + " men kunde inte läsa payload" + ", 4) requestDebug: " + requestDebug);
+                }
+            }
+        }
+    } on fail error e {
+        return {
+            "status": 500,
+            "error": e.message(),
+            "stackTrace": e.stackTrace().toString(),
+            "request": requestDebug
+        };
+    }
+}
+
+// Steg 2 - Skapa en ny GUID. Att användas i SKV api
+function getNewGUID() returns json {
+    string guid = uuid:createType4AsString();
+    return { "guid": guid };
+}
+
+// Steg 3 - Hämta (GET) en personpost ifrån SKV
+// PersonNr: Ange ett personnummer som skall hämtas. I ett format som SKV's api vill ha det.
+// skvAccessToken: Access-token som hämtats i steg 1.     
+// skvCorrelationId: GUID som hämtats i steg 2.
+    
+function hamtaPersonFranSKV(string personNr, string skvAccessToken, string skvCorrelationId) returns json {
+    do {
+        // 1. Skapa request och sätt header
+        http:Request req = new;
+
+        // 2. Bygg header
+        req.setHeader("Content-Type", "application/json");
+        req.setHeader("Authorization", "Bearer " + skvAccessToken);
+        req.setHeader("skv_client_correlation_id", skvCorrelationId);
+        req.setHeader("client_id", SKV_API_CLIENT_ID);
+        req.setHeader("client_secret", SKV_API_CLIENT_SECRET);
+
+        // 3. Förbered payload NOT: Måste ligga på EN rad i denna kod även om den i cURL kan ligga på fler rader!!
+        // Motsvaras av --data i cURL
+        string formData = "{\"bestallning\":{\"organisationsnummer\":162021004748,\"bestallningsidentitet\":\"00000236-FO01-0001\"},\"sokvillkor\":[{\"identitetsbeteckning\":" + personNr + "}]}";
+
+        // 5. Lägg på formData på payload
+        req.setPayload(formData);
+
+        http:Client skvClient = check new(SKV_API_URL);
+
+        // 8. Skicka POST-anrop
+        http:Response personResp = check skvClient->post("", req);
+
+        if personResp.statusCode == 200 {
+            json|error personJson = personResp.getJsonPayload();
+            if personJson is json {
+                log:printInfo("Person hämtad");
+                return personJson;
+            } else {
+                fail error("1) requestDebug: N/A");
+            }
+        } else {
+            // Försök hämta respons som JSON
+            json|error errorJson = personResp.getJsonPayload();
+            if errorJson is json {
+                fail error("Skatteverket svarade med status: " + personResp.statusCode.toString() + ", 2) requestDebug: N/A");
+            } else {
+                // Om inte JSON, hämta textpayload
+                string|error errorText = personResp.getTextPayload();
+                if errorText is string {
+                    fail error("Skatteverket svarade med status: " + personResp.statusCode.toString()
+                            + " och payload: " + errorText + ", 3) requestDebug: N/A");
+                } else {
+                    fail error("Skatteverket svarade med status: " + personResp.statusCode.toString()
+                            + " men kunde inte läsa payload" + ", 4) requestDebug: N/A");
+                }
+            }
+        }
+    } on fail error e {
+        return {
+            "status": 500,
+            "error": e.message(),
+            "stackTrace": e.stackTrace().toString(),
+            "request": "N/A"
+        };
+    }
+}
