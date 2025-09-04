@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:8080
 paths:
-  /person/hamtaTokenAndGUIDAndPerson:
+  /hamtaTokenAndGUIDAndPerson:
     get:
       summary: Hämta token, GUID och persondata från SKV
       parameters:
@@ -44,7 +44,7 @@ paths:
                     type: string
                   detail:
                     type: string
-  /person/checkEnv:
+  /checkEnv:
     get:
       summary: Kontrollera vilken miljö som körs
       responses:
@@ -61,7 +61,7 @@ paths:
                     type: string
                   value:
                     type: string
-  /person/hamtaPerson/{id}:
+  /hamtaPerson/{id}:
     get:
       summary: Hämta en person via id
       parameters:
@@ -79,7 +79,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/person'
-  /person/hamtaAllaPersonerSortByIdAsc:
+  /hamtaAllaPersonerSortByIdAsc:
     get:
       summary: Hämta alla personer sorterade på id
       responses:
@@ -91,7 +91,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/person'
-  /person/hamtaAllaPersonerSortByEfternamnAsc:
+  /hamtaAllaPersonerSortByEfternamnAsc:
     get:
       summary: Hämta alla personer sorterade på efternamn
       responses:
@@ -103,7 +103,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/person'
-  /person/skapaPerson:
+  /skapaPerson:
     post:
       summary: Skapa en ny person
       requestBody:
@@ -124,7 +124,7 @@ paths:
                     type: string
                   id:
                     type: integer
-  /person/uppdateraPerson/{id}:
+  /uppdateraPerson/{id}:
     put:
       summary: Uppdatera en befintlig person
       parameters:
@@ -151,7 +151,7 @@ paths:
                     type: string
                   id:
                     type: integer
-  /person/tabortPerson/{id}:
+  /tabortPerson/{id}:
     delete:
       summary: Ta bort en person
       parameters:
@@ -170,7 +170,7 @@ paths:
                 properties:
                   message:
                     type: string
-  /person/hamtaPersonByPersonnummer:
+  /hamtaPersonByPersonnummer:
     get:
       summary: Hämta en person via personnummer
       parameters:
